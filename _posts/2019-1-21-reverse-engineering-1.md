@@ -91,10 +91,11 @@ Another thing to keep in mind whilst reading this is that the disassemblies will
 
 Firstly, I'd like to begin with the analysis by substituting the right-hand hexadecimal addresses to their correspondent datum, this can be achieved by the GDB command `x/s <addr>` (to read strings at some `<addr>`), and so, allow me to provide these:
 
-
+```
 |    address  |            string              |
 |-------------|--------------------------------|
 | `0x80007ff` | `"password1"`                  |
 | `0x8000821` | `"No, %s is not correct.\n"`   |
 | `0x8000809` | `"Yes, %s is correct!\n"`      |
 | `0x80007e4` | `"Need exactly one argument."` |
+```
