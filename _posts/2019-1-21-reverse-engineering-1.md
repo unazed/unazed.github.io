@@ -99,3 +99,58 @@ Firstly, I'd like to begin with the analysis by substituting the right-hand hexa
 | `0x8000809` | `"Yes, %s is correct!\n"`      |
 | `0x80007e4` | `"Need exactly one argument."` |
 ```
+
+```assembly
+   0x00000000080005c0 <+0>:     cmp    $0x2,%edi
+   0x00000000080005c3 <+3>:     push   %rbx
+   0x00000000080005c4 <+4>:     jne    0x8000614 <main+84>
+```
+
+To dive in, `+0` compares `argc` by `0x2` (recall `%[re]di` is `int argc` as defined by the CRT), hereafter preserves `%rbx` and given that the comparison was not truthy, jumps to `+84`, allow us to write parallel C code which resembles the control flow of the assembly that we observe:
+
+```c
+int
+main (int argc, char **argv)
+{
+  if (argc != 2)
+  {
+    /* <...> */
+  }
+  /* <...> */
+}
+```
+
+Now from here I'll lead to decompile everything at `+84` and to wherever it leads so that we can complete the if-clause, as we can intuitively presume that it will return from the program abruptly, as it is reached if `argc` is not equal to 2, i.e. there are not two arguments passed by the caller.
+
+```assembly
+   0x0000000008000614 <+84>:    lea    0x1c9(%rip),%rdi        # "Need exactly one argument."
+   0x000000000800061b <+91>:    or     $0xffffffff,%ebx
+   0x000000000800061e <+94>:    callq  0x8000590 <puts@plt>
+   0x0000000008000623 <+99>:    jmp    0x80005fb <main+59>
+```
+
+We load the address of the right-hand string into the first-parameter slot of the proceeding `puts` call, hence performing `puts ("Need exactly one argument.");` and thereafter unconditionally jumping to `+59`.
+*Note that `+91` simply places `0xffffffff` into `%ebx` using bitwise operations.*
+
+```assembly
+   0x00000000080005fb <+59>:    mov    %ebx,%eax
+   0x00000000080005fd <+61>:    pop    %rbx
+   0x00000000080005fe <+62>:    retq
+```
+
+Conclusively, we move the `0xffffffff` into `%eax` and return to the caller, effectively returning `-1` in two's complement (as the signature of the `main` function is defined `int main (int argc, char **argv, char **envp);` and `int` is a signed type.
+In total these operations lead to the following C:
+
+```c
+int
+main (int argc, char **argv)
+{
+  if (argc != 2)
+  {
+    puts ("Need exactly one argument.");
+    return -1;
+  }
+  /* <...> */
+}
+```
+
