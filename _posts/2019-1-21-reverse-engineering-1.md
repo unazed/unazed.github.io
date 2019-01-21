@@ -1,6 +1,6 @@
 ---
 layout: post
-title: reverse engineering crackme \#1
+title: reverse engineering crackme 1
 ---
 
 Seeing as this is my first post, and I'm not entirely adjusted to writing blog-posts, I'll begin with an introduction.
