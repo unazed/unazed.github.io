@@ -26,6 +26,8 @@ body {
 @font-face {
   font-family: CMU;
   src: url(https://fontlibrary.org/assets/fonts/cmu-serif/59c4efc3fa08079ca44060ca808c8f58/01643be9fa75a4523c77ac348b242aed/CMUSerifRoman.ttf);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
