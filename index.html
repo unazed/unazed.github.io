@@ -3,13 +3,9 @@ layout: default
 ---
 
 <div class="posts">
-  <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/cmu-serif" type="text/css"/>
   {% for post in site.posts %}
     <article class="post">
-
       <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
-
-      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">...</a>
     </article>
   {% endfor %}
 </div>
