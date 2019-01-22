@@ -84,6 +84,182 @@ This is a trivial example of side-effects, note that putting this on one-line wi
 ]
 ```
 
-Which will print the same results as the former code, except this form may be condensable into a one-line form.
+Which will print the same results as the former code, except this form may be condensable into a one-line form. Note that I am not implying that for-loops are perfectly transformable into their one-line counterparts, as a trivial example would be as follows:
+
+```py
+for i in range(m, n):
+  if i == j:
+    break
+  print(i)
+```
+
+How would you think, that you could implement this in one-line form (for any `m`, `n`, `i` and `j`)? Well, without using stdlib imports, here's how I'd do it:
+
+```py
+[print(i) for i in range(m, n) if i < j]
+```
+
+Easy, right? Now how would you implement this:
+
+```py
+for i in range(m, n):
+  if i == j:
+    print(i, j)
+    break
+  print(i)
+```
+
+A small change completely changes the output, since in the first piece of code the fact it was easy was due to the fact that there was a practically empty terminating `if` clause, and due to this, there was no 'breaking procedure', like there is in this, therefore the only thing you had needed to do was simply check `i` against a condition, and not print it if it didn't meet a condition.
+In this case, if it does meet the condition, you have to do something _and_ break the loop; here's how I'd do it:
+
+```py
+[
+  (
+    print(i, j),
+    globals().__setitem__("_term", True)
+  )
+    if i == j else
+  print(i)
+  for i in (
+    globals().__setitem__("_term", False),
+    *range(m, n)
+  )[1:]
+  if not _term
+]
+```
+
+Notice how I've increased my character count by nearly a factor of 5? It was due to the fact I had to implement the `_term` variable's initialization and the setting of it after `i == j`, although this is horrible to read, it is luckily the most general form of the for loop in this sense:
+
+```py
+[
+  (
+    <breaking-clause>,
+    globals().__setitem__("_term", True)
+  )
+    if <breaking-condition> else
+  <continue>
+  for <iterant> in (
+    globals().__setitem__("_term", False),
+    *<sequence>
+  )
+  if not _term
+]
+```
+
+Equivalent to:
+
+```py
+for <iterant> in <sequence>:
+  if <breaking-condition>:
+    <breaking-clause>
+    break
+  <continue>
+```
+
+Although the for-loop has the `else` clause from itself, which is executed after the loop finishes normally can be implemented like this:
+
+```py
+(
+  [
+    (
+      <breaking-clause>,
+      globals().__setitem__("_term", True)
+    )
+      if <breaking-condition> else
+    <continue>
+    for <iterant> in (
+      globals().__setitem__("_term", False),
+      *<sequence>
+    )
+    if not _term
+  ],
+  <else-clause> if not _term else None
+)
+```
+
+Equivalent to:
+
+```py
+for <iterant> in <sequence>:
+  if <breaking-condition>:
+    <breaking-clause>
+    break
+  <continue>
+else:
+  <else-clause>
+```
+
+Which is quite beautiful as it illustrates the for loop explicitly, using for loops and simple conditions (somewhat).
+
+Moving onto `while` loops, this construct is equally as beautiful as it can be applied in many of the same ways as a for loop can be. Effectively, any construct can imitate any other construct with the given of `globals().__setitem__` and `globals().__getitem__` if you tried hard enough. Take an example of a while-loop in action here:
+
+```py
+variable = 5
+while variable < 100:
+  variable += variable ** .5
+  print(f"variable={variable:.2f}")
+```
+
+A simple example, translated to:
+
+```py
+while (
+  globals().__setitem__("variable", 5)
+    if globals().get("variable", None) is None else
+  globals().__setitem__("variable", variable + variable ** .5),
+  print(f"variable={variable:.2f}"),
+  variable < 100
+)[-1]: pass
+```
+
+As tempted as someone may be to put the `print` outwith the while-conditional itself, it is _not_ the same as the former code given as it would run an iteration behind, although it is arguably more beautiful that having the `print` inside. The general structure that I define for any while-loop of the form:
+
+```py
+<pre-loop>
+while <condition>:
+  <while-clause>
+```
+
+Is generally convertible to:
+
+```py
+while (
+  <pre-loop>,
+  <condition>
+)[-1]: pass
+```
+
+Now, an important note, is that occasionally you may use the while-clause itself to run code, and it is completely fine and I suggest doing so whenever possible because it is both beautiful and paradigmatic of one-lining; a simple `pass` seems slightly cheaty, since you can also use it as such:
+
+```py
+while (
+  globals().__setitem__("variable", 5)
+    if globals().get("variable", None) is None else
+  None,
+  print(f"variable={variable:.2f}"),
+  variable < 100
+)[-1]: variable += variable ** .5
+```
+
+Or:
+
+```py
+while (
+  [*(
+    (
+      globals().__setitem__("_variable", _variable + _variable ** .5),
+      print(f"variable={_variable:.2f}"),
+      _variable < 100
+    ) for _ in range(1)
+  )][0][-1]
+    if globals().get("variable", None) is not None else
+  (
+    globals().__setitem__("_variable", 5),
+    True
+  )[1]
+): variable = 5
+```
+
+The last one is a slight joke, although I do recommend that you try to understand why it works (hint: `variable` is a dummy variable), but I'm simply alternating between what is in the while-clause, form `pass` to `variable += variable ** .5` to the less sensical `variable = 5`.
 
 TBF
