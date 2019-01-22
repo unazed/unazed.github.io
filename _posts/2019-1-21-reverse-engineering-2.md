@@ -207,7 +207,7 @@ main (int argc, char **argv)
     }
   if (!argv[1][0])
     {
-      printf ("f1, No, %s is not correct.\n", argv[1]);
+      printf ("No, %s is not correct.\n", argv[1]);
       return 1;
     }
   size_t acc = 0;
