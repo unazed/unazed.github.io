@@ -3,8 +3,8 @@ layout: page
 ---
 
 <div class="posts">
-  asdasdasdasdasd b {{ site.posts | size}}
-  {% for post in site.posts %}
+  asdasdasdasdasd b {{ site.collections.docs | size}}
+  {% for post in site.collections.docs %}
     <article class="post">
       <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
     </article>
