@@ -262,4 +262,24 @@ while (
 
 The last one is a slight joke, although I do recommend that you try to understand why it works (hint: `variable` is a dummy variable), but I'm simply alternating between what is in the while-clause, form `pass` to `variable += variable ** .5` to the less sensical `variable = 5`.
 
+Now imagine while-loops with side-effects, although in actuality the previous two while loops both have side-effects and are impure, they're much more subtle, and I'd like to give an explicit example of a while loop with side effects:
+
+```py
+while (
+    globals().__setitem__("n", globals().get("n", 1)),
+    globals().__setitem__("n", n + 50),
+    n < 100
+  )[-1]:
+  print(n) 
+```
+
+To amateurly prove that this has side-effects, run it through the Python interpreter twice, each time recording the `n` value, and seeing if it changes. If it does, it's impure, otherwise it's pure (unless it's based on a random probability). To move onto making one-line while-loops, I'd like for the reader to recall to their C experiences (if any), and especially the fact that `while (1) {}` is equivalent to `for (;;) {}`, that is, a for-loop with no iterant, disposition nor condition.
+
+```py
+for:
+  <for-clause>
+```
+
+There's no real good way to imitate while-loops as a take on for-loops in Python without using stdlib like in `itertools`, which is completely fine in one-lining, however pure Python is always good. Recursion will not get you far really, not further than the recursion limit on your system. Use `itertools.cycle` for infinite sequences of cycling data.
+
 TBF
