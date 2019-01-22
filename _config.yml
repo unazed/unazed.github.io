@@ -20,9 +20,16 @@ kramdown:
   syntax_highlighter_opts:
     css_class: 'highlight'
 
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
 collections:
-  _posts:
-    output    : true
+  posts:
+    output: true
 
 sass:
   style: :expanded 
