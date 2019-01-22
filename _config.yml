@@ -23,6 +23,7 @@ kramdown:
 collections:
   posts:
     output    : true
+    permalink : /:name
 
 sass:
   style: :expanded 
