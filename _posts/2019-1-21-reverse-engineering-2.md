@@ -192,5 +192,46 @@ main (int argc, char **argv)
 
 Before we go into analysing this, recall: `%ecx` = 0 and `%edx` = 1 (before the loop is iterated), `+97` is a return proc., `+78` is a fail proc., `%eax` is the first character, and `+32` is the start. `+40` is equivalent to moving the sign-extended version of `-0x1(%rsi + %rdx)` into `%eax`, where `%rsi` is `argv[1]` and `%edx` is an increasing amount as deduced from `+34`, therefore `-0x1(argv[1] + %edx)` is essentially `argv[1][%edx - 1]` for ever-increasing values of `%edx`, so `%eax` contains each consecutive byte of the `argv[1]` string, then we test the character by itself, if it's not zero then we restart the loop (note: `%ecx` accumulates the characters).
 From this perspective it actually appears that there is a possible buffer overrun given that `argv[1]` is not a C-string, therefore running into undefined memory, which is most likely why it also could run forever given that the character is never `\0`.
+Finally, if the character is zero, it compares the string's length to 16 (due to `+32` moving the string's length into `%edi`), presumably jumps to a fail procedure if it is not equal, otherwise also compares the accumulator `%ecx` to `0x6e2`, and if equal then `printf ("Yes, %s is correct!\n", argv[1]);`.
 
-TBF
+Now to construct this assembly back into C, we can represent it as a do-while loop:
+
+```c
+int
+main (int argc, char **argv)
+{
+  if (argc != 2)
+    {
+      puts ("Need exactly one argument.");
+      return -1;
+    }
+  if (!argv[1][0])
+    {
+      printf ("f1, No, %s is not correct.\n", argv[1]);
+      return 1;
+    }
+  size_t acc = 0;
+  size_t length = 0;
+
+  do
+    {
+      acc += argv[1][length++];
+    }
+  while (argv[1][length]);
+
+  if (length != 16)
+    {
+      printf ("No, %s is not correct.\n", argv[1]);
+      return 1;
+    }
+  if (acc == 0x6e2)
+    {
+      printf ("Yes, %s is correct!\n", argv[1]);
+      return 0;
+    }
+}
+```
+
+Which, finally functions as intended.
+
+See you in the next post.
