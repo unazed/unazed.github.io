@@ -1,4 +1,4 @@
 ---
-layout: post
+layout: title
 title: reverse engineering 3
 ---
