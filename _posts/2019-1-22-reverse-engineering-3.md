@@ -250,7 +250,7 @@ And now, most likely the most difficult function, `cur_hour`:
    0x0000000008000998 <+56>:    retq
    0x0000000008000999 <+57>:    nopl   0x0(%rax)
    0x00000000080009a0 <+64>:    callq  0x8000760 <strerror@plt>
-   0x00000000080009a5 <+69>:    lea    0xb7(%rip),%rdi        # "Access denied."
+   0x00000000080009a5 <+69>:    lea    0xb7(%rip),%rdi        # "ERROR: Could not get time: %s"
    0x00000000080009ac <+76>:    mov    %rax,%rsi
    0x00000000080009af <+79>:    xor    %eax,%eax
    0x00000000080009b1 <+81>:    callq  0x8000730 <printf@plt>
@@ -258,4 +258,164 @@ And now, most likely the most difficult function, `cur_hour`:
    0x00000000080009bb <+91>:    jmp    0x8000992 <cur_hour+50>
 ```
 
-TBF
+And indeed it is, it is also equivalently more interesting. Allow me to begin:
+
+```assembly
+   0x0000000008000960 <+0>:     push   %rbp
+   0x0000000008000961 <+1>:     push   %rbx
+   0x0000000008000962 <+2>:     sub    $0x18,%rsp
+   0x0000000008000966 <+6>:     lea    0x8(%rsp),%rbp
+   0x000000000800096b <+11>:    mov    %rbp,%rdi
+   0x000000000800096e <+14>:    callq  0x8000740 <time@plt>
+   0x0000000008000973 <+19>:    callq  0x8000700 <__errno_location@plt>
+   0x0000000008000978 <+24>:    mov    (%rax),%edi
+   0x000000000800097a <+26>:    test   %edi,%edi
+   0x000000000800097c <+28>:    jne    0x80009a0 <cur_hour+64>
+```
+
+Here is the relevant part of the `man` pages for `time`:
+
+```
+SYNOPSIS
+       #include <time.h>
+
+       time_t time(time_t *tloc);
+
+DESCRIPTION
+       time() returns the time as the number of seconds since the Epoch, 1970-01-01 00:00:00 +0000 (UTC).
+
+       If tloc is non-NULL, the return value is also stored in the memory pointed to by tloc.
+```
+
+**EDITORIAL NOTE:** `The tloc argument is obsolescent and should always be NULL in new code.  When tloc is NULL, the call cannot fail.`
+
+So, `0x8(%rsp)` contains `time_t`, and the subsequent `__errno_location` call is one to retrieve the `errno` variable address, afterwards `+24` and `+26` testing if the `errno` is non-zero (an error, I presume), if so, jumping to `+64`:
+
+```assembly
+   0x00000000080009a0 <+64>:    callq  0x8000760 <strerror@plt>
+   0x00000000080009a5 <+69>:    lea    0xb7(%rip),%rdi        # "ERROR: Could not get time: %s"
+   0x00000000080009ac <+76>:    mov    %rax,%rsi
+   0x00000000080009af <+79>:    xor    %eax,%eax
+   0x00000000080009b1 <+81>:    callq  0x8000730 <printf@plt>
+   0x00000000080009b6 <+86>:    mov    $0xffffffff,%eax
+   0x00000000080009bb <+91>:    jmp    0x8000992 <cur_hour+50>
+```
+
+Hence calling `printf ("ERROR: Could not get time: %s", strerror (errno));` and `return -1;`
+So, we have:
+
+```c
+UNKNOWN
+cur_hour (void)
+{
+  time_t time_;
+  time (&time_);
+  if (errno)
+  {
+    printf ("ERROR: Could not get time: %s", strerror (errno));
+    return -1;
+  }
+  /* <...> */
+}
+```
+
+Otherwise, we continue with:
+
+```assembly
+   0x000000000800097e <+30>:    mov    %rax,%rbx
+   0x0000000008000981 <+33>:    mov    %rbp,%rdi
+   0x0000000008000984 <+36>:    callq  0x80006f0 <localtime@plt>
+   0x0000000008000989 <+41>:    mov    (%rbx),%edi
+   0x000000000800098b <+43>:    test   %edi,%edi
+   0x000000000800098d <+45>:    jne    0x80009a0 <cur_hour+64>
+   0x000000000800098f <+47>:    mov    0x8(%rax),%eax
+   0x0000000008000992 <+50>:    add    $0x18,%rsp
+   0x0000000008000996 <+54>:    pop    %rbx
+   0x0000000008000997 <+55>:    pop    %rbp
+   0x0000000008000998 <+56>:    retq
+```
+
+Where we call `localtime (&time_);`, thereafter checking the `errno` again with `+41`, otherwise moving the `tm_hour` member of the returned structure into `%eax` and returning it. Finally, we have:
+
+```c
+int
+cur_hour (void)
+{
+  time_t time_;
+  time (&time_);
+  if (errno) goto if_errno;
+  struct tm *ptr = localtime (&time_);
+  if (errno) goto if_errno;
+  return ptr->tm_hour;
+  
+if_errno:
+  printf ("ERROR: Could not get time: %s", strerror (errno));
+  return -1;
+}
+```
+
+Note that I use the goto statement, as analogous to the assembly code since it removes repetition and ultimately doesn't make any control flow any more confusing.
+In total, we have:
+
+```c
+int
+cur_hour (void)
+{
+  time_t time_;
+  time (&time_);
+  if (errno)
+    goto if_errno;
+  struct tm *ptr = localtime (&time_);
+  if (errno)
+    goto if_errno;
+  return ptr->tm_hour;
+
+if_errno:
+  printf ("ERROR: Could not get time: %s", strerror (errno));
+  return -1;
+}
+
+void
+succeed (void)
+{
+  puts ("Access granted!");
+  exit (0);
+}
+
+void
+fail (void)
+{
+  puts ("Access denied!");
+  exit (1);
+}
+
+int
+main (int argc, char **argv)
+{
+  if (argc != 2)
+    {
+      puts ("Need exactly one argument.");
+      return -1;
+    }
+  if (strncmp (argv[1], "password1", 0x9))
+    {
+      fail ();
+    }
+  int hour = cur_hour ();
+
+  if (5 <= hour && hour <= 6)
+    {
+      succeed ();
+    }
+  else
+    {
+      fail ();
+    }
+}
+```
+
+A few changes made, that is, adding the `else` clause to the final `main`'s condition as I'd forgotten to, fixing the conditional itself as C doesn't support operator linking like `a < b < c`, rather expanded to `a < b && b < c`, and finally moved the variable outside into `hour`. Also the styling change using `indent`, as I like GNU-style.
+
+All-in-all, fairly interesting to learn about how `errno` works in the binary-standard with `__errno_location`, otherwise trivial work.
+
+See you later.
