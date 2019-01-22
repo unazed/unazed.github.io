@@ -2,21 +2,6 @@ name: Unazed Spectaculum
 description: software developer
 avatar: https://avatars2.githubusercontent.com/u/29807271?s=460&v=4
 
-footer-links:
-  dribbble:
-  email:
-  facebook:
-  flickr:
-  github: barryclark/jekyll-now
-  instagram:
-  linkedin:
-  pinterest:
-  rss: 
-  twitter: 
-  stackoverflow: 
-  youtube: 
-  googleplus:
-
 
 disqus:
 google_analytics:
@@ -34,6 +19,11 @@ kramdown:
   syntax_highlighter: Pygments
   syntax_highlighter_opts:
     css_class: 'highlight'
+
+collections:
+  posts:
+    output    : true
+    permalink : /:collection/:path/
 
 sass:
   style: :expanded 
