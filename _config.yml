@@ -21,9 +21,8 @@ kramdown:
     css_class: 'highlight'
 
 collections:
-  posts:
+  _posts:
     output    : true
-    permalink : /:name
 
 sass:
   style: :expanded 
