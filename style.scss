@@ -58,10 +58,15 @@ h1, h3, h4, h5, h6 {
 }
 
 h2 {
-  line-height: 1.7;
-  @include mobile {
-    line-height: 1.4;
-  }	
+    line-height: 1.7;
+    margin: 2em 0 15px;
+    font-family: CMU;
+    font-size: 22px;
+    border-left: 2px solid #465356;
+    padding-left: 1em;
+    @include mobile {
+	    line-height: 1.4;
+	}
 }
 
 
