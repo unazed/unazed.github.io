@@ -282,4 +282,53 @@ for:
 
 There's no real good way to imitate while-loops as a take on for-loops in Python without using stdlib like in `itertools`, which is completely fine in one-lining, however pure Python is always good. Recursion will not get you far really, not further than the recursion limit on your system. Use `itertools.cycle` for infinite sequences of cycling data.
 
-TBF
+Exception handling is a bitch, here's an example of it from a socket-library that I made on my `python-one-liners` repository:
+
+```py
+(
+  "receive_all",
+  lambda self, ssize=4192, signal_timeout=2, _buffer=b"":
+  (
+    globals().__setitem__('_timeout',
+      lambda time_, f, *args, **kwargs: (
+        globals().__setitem__("signal", __import__("signal")),
+        signal.signal(signal.SIGALRM, lambda _, frame: 0/0),
+        signal.alarm(signal_timeout),
+        f(*args, **kwargs),
+        signal.alarm(0)
+      )
+    ),
+    setvar(
+      "_inner_receive_all",
+      lambda self, ssize=4192, _buffer=b"": (
+        exec(
+          "def _autistic_receive_all(self, ssize=4192, _buffer=b''):\n\t"
+            "try:"
+              "return [_autistic_receive_all(self, ssize, _buffer+data) if data else _buffer for data in [self.socket.recv(ssize)]][0]\n\t"
+            "except:"
+              "return _buffer\n"
+          "globals()['_autistic_receive_all'] = _autistic_receive_all"
+        ),
+        _autistic_receive_all
+      )[1]
+    ),
+    _timeout(signal_timeout, _inner_receive_all(self), self, ssize)
+  )
+)
+```
+
+Yeah, there's no other real way to do it besides using `exec`, sorry. The most interesting thing there is the actual method I used for implementing a 'receive-all-data' method for a socket, using the UNIX signals and causing a `ZeroDivisionError` upon a certain timeout, hereafter unhanging the `self.socket.recv(ssize)` and returning back to the caller by the `return _buffer` which is quite genius if I say so for myself.
+
+Lambdas are, in eyes of one-lining, simply a generalized sequence of array items (i.e. the parameters), with a return value which can be linked. I use them to simplify certain pieces of code, such as above, the `setvar`, `_inner_receive_all` and `_timeout` which would be impossible to do without in that certain code.
+You can technically use the `def` notation, but you wouldn't be able to use it to access any more than a regular `lambda` definition could.
+Imports are achieved by `__import__`, classes are also one-lineable by using `type(<name>, <bases>, <var-dict>)` or `import types` and `types.ClassType` with the same parameters.
+
+One-line etiquette is as follows:
+
+- Don't use semicolons.
+- Only use `exec` for exception-handling.
+- If you're using it for obfuscation, the last thing that should be obfuscating it are the variable names, obfuscation comes from within the one-line's nature, if it doesn't, you aren't doing it well enough.
+- Nobody likes boring code, encapsulate the stdlib, while/for-loops, lambdas, classes, multi-dimensional iteration, impure functionality, obscure control flow, anything and everything that isn't against one-line etiquette.
+- Sneak in an `__import__("this")` somewhere inside the code, for purposes of irony.
+
+Thanks for reading.
