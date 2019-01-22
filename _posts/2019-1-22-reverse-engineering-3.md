@@ -1,4 +1,4 @@
 ---
-layout: title
-post: reverse engineering crackme 3
+layout: post
+title: reverse engineering crackme 2
 ---
