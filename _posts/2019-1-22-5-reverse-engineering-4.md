@@ -211,6 +211,32 @@ Then:
    0x000000000800072e <+78>:    jne    0x80007c6 <main+230>
 ```
 
-We save `argv` at `0x8(%rsp)`, allocate a 15 byte buffer at `%rbp` and call `cpuid` with a parameter of 0; therefore by (this table)[https://c9x.me/x86/html/file_module_x86_id_45.html] we can deduce that:
+We save `argv` at `0x8(%rsp)`, allocate a 15 byte buffer at `%rbp` and call `cpuid` with a parameter of 0; therefore by (this table)[https://c9x.me/x86/html/file_module_x86_id_45.html] we can deduce that, `%eax` will contain something, `%ebx` will contain the four bytes `"Genu"`, `%ecx` will contain `"ntel"` and `%edx` will contain `"ineI"`.
 
-TBF
+We can cut the entire reversing short by setting a breakpoint on `+196` and doing an `i r` and getting the `%rdi` register, tracing it to the string and voila:
+
+```
+(gdb) b *0x00000000080007a4
+Breakpoint 3 at 0x80007a4
+(gdb) r arg
+Starting program: /home/unazed/crackme arg
+
+Breakpoint 3, 0x00000000080007a4 in main ()
+(gdb) i r
+[...]
+rdi            0x8402010        138420240
+[...]
+(gdb) x/s 0x8402010
+0x8402010:      "NGenuineIntelQ"
+```
+
+Afterwards, plugging in `"NGenuineIntelQ"` to see whether it works:
+
+```
+>./crackme "NGenuineIntelQ"
+Yes, NGenuineIntelQ is correct!
+```
+
+Although this form of reverse engineering where you trace and pinpoint certain strings in the programs, breakpointing important calls like `strncmp`, etc., is useful in this context since I know that the program isn't malicious and hence not requiring of any more control-flow analysis, but in contexts where you have arbitrary code it is much better to analyse where the rest of the code leads and further decompile the program, as it is safer and more reliable.
+
+Thanks for reading.
