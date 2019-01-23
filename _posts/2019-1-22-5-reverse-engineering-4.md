@@ -211,9 +211,9 @@ Then:
    0x000000000800072e <+78>:    jne    0x80007c6 <main+230>
 ```
 
-We save `argv` at `0x8(%rsp)`, allocate a 15 byte buffer at `%rbp` and call `cpuid` with a parameter of 0; therefore by (this table)[https://c9x.me/x86/html/file_module_x86_id_45.html] we can deduce that, `%eax` will contain something, `%ebx` will contain the four bytes `"Genu"`, `%ecx` will contain `"ntel"` and `%edx` will contain `"ineI"`.
+We save `argv` at `0x8(%rsp)`, allocate a 15 byte buffer at `%rbp` and call `cpuid` with a parameter of 0; therefore by [this table](https://c9x.me/x86/html/file_module_x86_id_45.html) we can deduce that, `%eax` will contain something, `%ebx` will contain the four bytes `"Genu"`, `%ecx` will contain `"ntel"` and `%edx` will contain `"ineI"`.
 
-We can cut the entire reversing short by setting a breakpoint on `+196` and doing an `i r` and getting the `%rdi` register, tracing it to the string and voila:
+We can cut the entire decompilation short by setting a breakpoint on `+196` and doing an `i r` and getting the `%rdi` register, tracing it to the string and voila:
 
 ```
 (gdb) b *0x00000000080007a4
