@@ -260,7 +260,7 @@ while (
 ): variable = 5
 ```
 
-The last one is a slight joke, although I do recommend that you try to understand why it works, but I'm simply alternating between what is in the while-clause, form `pass` to `variable += variable ** .5` to `variable = 5`, you may theoretically put anything there.
+The last one is a slight joke, although I do recommend that you try to understand why it works, but I'm simply alternating between what is in the while-clause, from `pass` to `variable += variable ** .5` to `variable = 5`, you may theoretically put anything there.
 
 Now imagine while-loops with side-effects, although in actuality the previous two while loops both have side-effects and are impure, they're much more subtle, and I'd like to give an explicit example of a while loop with side effects:
 
