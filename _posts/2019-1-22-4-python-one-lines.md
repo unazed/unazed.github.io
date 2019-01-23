@@ -5,12 +5,12 @@ title: python one liners (without semicolons)
 
 Python, as you should know, is a versatile and flexible language, for this it suffers the well-debated repercussion of speed and performance. What goes on in this post is the complete inverse of performance-gaining, and should not be done at any point in your development, unless it is skid-quality code where you aren't expected to reach a certain bar of quality, then, by all means, go for it.
 
-By most, it'd be considered entry-grade level obfuscation, by myself I'd consider it art; there is nothing quite like doing it proficiently, as it's a brain puzzles in most cases to even start thinking up ways of one-lining certain constructs. I would never (no pinky promises), and nor do I ever suggest that you should use this as obfuscation, unless, as mentioned before you don't expect anyone to really even open it up, let alone try and figure out what it does in reality.
-It is simply unstable, and many of the methodologies you employ to make your coder harder to understand, there will still be trivial bypasses to circumvent your clever logic, as this is no different in reality from writing imperative code (as one-line programs are very majorly functional).
+By most, it'd be considered entry-grade level obfuscation, by myself I'd consider it art; there is nothing quite like doing it proficiently, as it's a brain puzzles in most cases to even start thinking up ways of one-lining certain constructs. I would never (no pinky promises), and nor do I ever suggest that you should use this as obfuscation, unless, as mentioned before you don't expect anyone to really even open it up, let alone try and figure out what it does.
+It is simply unstable, and for many of the methodologies you employ to make your coder harder to understand, there will still be trivial bypasses to circumvent your clever logic, as this is no different in reality from writing imperative code (as one-line programs are very majorly functional).
 
 To begin, allow me to introduce the atoms of one-liners, that is, `globals()` and `locals()` (less `locals()` more `globals()` though), these are the dictionaries which dictate the variable namespaces of Python programs at, respectively, the `global` and `local` scopes (at the top-level and within functions), with these and the combined attributes of dictionaries such as `dict.__setitem__(k, v)` and `dict.__getitem__(k) -> v`, you can trivially understand the basis of a one-line program: a sequence of getter/setter calls, with arbitrary operations. And, to its core, that is the prime construct of one-lining, but your programs would be considered tasteless were they simply to be of this content.
 
-Now, to sequence together these setter/getter calls we would prefer not to use semicolons (as that is not the topic), we would prefer to use something much more Pythonic (enough) and clean (and usable), something like lists and tuples; since you can group together calls in iterables like these. For example:
+Now, to sequence together these setter/getter calls we would prefer not to use semicolons (as that is not the topic), we would prefer to use something much more Pythonic (enough) and clean, something like lists and tuples; since you can group together calls in iterables. For example:
 
 ```py
 print([
@@ -32,7 +32,7 @@ Which simply: creates a global `a` initialized to 1, prints it, retrieves it and
 2
 ```
 
-Of course we can condense this into one line by taking off the newlines proceeding the commas and last item, and it would still obviously work. However for the case of this post I will continue using the prettified syntax as one-lines can grow exponentially complex.
+Of course we can condense this into one line by taking off the newlines proceeding the commas and last item, and it would still work. However for the case of this post I will continue using the prettified syntax as one-lines can grow exponentially complex.
 
 Other important keywords include all of the general control-flow syntax, e.g.: `for`, `while`, `if`, `elif`, etc., it is important to realize that keywords that are generally used in ternary notation, or in embedded notation do not have to necessarily do so in order to achieve a functional one-line, take the example:
 
@@ -65,7 +65,7 @@ for _ in range(2):
     print(n)
 ```
 
-This is a trivial example of side-effects, note that putting this on one-line without changing anything except whitespace would be invalid no matter how, however the intent of this knowledge is to be applicable into concepts such as list comprehensions, for example:
+This is an example of side-effects, note that putting this on one-line without changing anything except whitespace would be invalid no matter how, however the intent of this knowledge is to be applicable into concepts such as list comprehensions, for example:
 
 ```py
 [
@@ -84,7 +84,7 @@ This is a trivial example of side-effects, note that putting this on one-line wi
 ]
 ```
 
-Which will print the same results as the former code, except this form may be condensable into a one-line form. Note that I am not implying that for-loops are perfectly transformable into their one-line counterparts, as a trivial example would be as follows:
+Which will print the same results as the former code, except this form may be condensable into a one-line form. Note that I am not implying that for-loops are perfectly transformable into their one-line counterparts, as a counter-example would be as follows:
 
 ```py
 for i in range(m, n):
@@ -109,7 +109,7 @@ for i in range(m, n):
   print(i)
 ```
 
-A small change completely changes the output, since in the first piece of code the fact it was easy was due to the fact that there was a practically empty terminating `if` clause, and due to this, there was no 'breaking procedure', like there is in this, therefore the only thing you had needed to do was simply check `i` against a condition, and not print it if it didn't meet a condition.
+A small change completely changes the resulting code, since in the first piece of code the fact it was simple was due to the fact that there was an empty terminating `if` clause, and due to this, there was no 'breaking procedure', unlike this code; therefore the only thing you had needed to do was simply check `i` against a condition, and not print it if it didn't meet a condition.
 In this case, if it does meet the condition, you have to do something _and_ break the loop; here's how I'd do it:
 
 ```py
@@ -128,7 +128,7 @@ In this case, if it does meet the condition, you have to do something _and_ brea
 ]
 ```
 
-Notice how I've increased my character count by nearly a factor of 5? It was due to the fact I had to implement the `_term` variable's initialization and the setting of it after `i == j`, although this is horrible to read, it is luckily the most general form of the for loop in this sense:
+Notice how I've increased my character count by nearly a factor of 5? It was due to the fact I had to implement the `_term` variable's initialization and the setting of it after `i == j`, although this is horrible to read, it is luckily the most general form of the for loop in this pattern:
 
 ```py
 [
@@ -156,7 +156,7 @@ for <iterant> in <sequence>:
   <continue>
 ```
 
-Although the for-loop has the `else` clause from itself, which is executed after the loop finishes normally can be implemented like this:
+Although the for-loop has the `else` clause from itself, which is executed after the loop finishes normally, and can be implemented like this:
 
 ```py
 (
@@ -191,7 +191,7 @@ else:
 
 Which is quite beautiful as it illustrates the for loop explicitly, using for loops and simple conditions (somewhat).
 
-Moving onto `while` loops, this construct is equally as beautiful as it can be applied in many of the same ways as a for loop can be. Effectively, any construct can imitate any other construct with the given of `globals().__setitem__` and `globals().__getitem__` if you tried hard enough. Take an example of a while-loop in action here:
+Moving onto `while` loops, this construct is equally as beautiful as it can be applied in many of the same ways as a for loop can be. Effectively, any construct can imitate any other construct with the given of `globals().__setitem__` and `globals().__getitem__` if you tried hard enough. Take an example of a while-loop here:
 
 ```py
 variable = 5
@@ -212,7 +212,7 @@ while (
 )[-1]: pass
 ```
 
-As tempted as someone may be to put the `print` outwith the while-conditional itself, it is _not_ the same as the former code given as it would run an iteration behind, although it is arguably more beautiful that having the `print` inside. The general structure that I define for any while-loop of the form:
+As tempted as someone may be to put the `print` outwith the while-conditional itself, it is _not_ the same as the former code given as it would run an iteration behind, although it is arguably more beautiful than having the `print` inside. The general structure that I define for any while-loop of the form:
 
 ```py
 <pre-loop>
@@ -229,7 +229,7 @@ while (
 )[-1]: pass
 ```
 
-Now, an important note, is that occasionally you may use the while-clause itself to run code, and it is completely fine and I suggest doing so whenever possible because it is both beautiful and paradigmatic of one-lining; a simple `pass` seems slightly cheaty, since you can also use it as such:
+Now, an important note, is that occasionally you may use the while-clause itself to run code, and it is completely fine and I suggest doing so whenever possible because it is both beautiful and paradigmatic of one-lining; a simple `pass` seems slightly cheaty, rather you can also substitute it for such:
 
 ```py
 while (
@@ -260,7 +260,7 @@ while (
 ): variable = 5
 ```
 
-The last one is a slight joke, although I do recommend that you try to understand why it works (hint: `variable` is a dummy variable), but I'm simply alternating between what is in the while-clause, form `pass` to `variable += variable ** .5` to the less sensical `variable = 5`.
+The last one is a slight joke, although I do recommend that you try to understand why it works, but I'm simply alternating between what is in the while-clause, form `pass` to `variable += variable ** .5` to `variable = 5`, you may theoretically put anything there.
 
 Now imagine while-loops with side-effects, although in actuality the previous two while loops both have side-effects and are impure, they're much more subtle, and I'd like to give an explicit example of a while loop with side effects:
 
@@ -273,14 +273,14 @@ while (
   print(n) 
 ```
 
-To amateurly prove that this has side-effects, run it through the Python interpreter twice, each time recording the `n` value, and seeing if it changes. If it does, it's impure, otherwise it's pure (unless it's based on a random probability). To move onto making one-line while-loops, I'd like for the reader to recall to their C experiences (if any), and especially the fact that `while (1) {}` is equivalent to `for (;;) {}`, that is, a for-loop with no iterant, disposition nor condition.
+To amateurly prove that this has side-effects, run it through the Python interpreter twice, each time recording the `n` value, and seeing if it changes. If it does, it's impure, otherwise it's pure (unless it's based on a random probability). Moving onto making one-line while-loops, I'd like for the reader to recall to their C experiences (if any), and especially the fact that `while (1) {}` is equivalent to `for (;;) {}`, that is, a for-loop with no iterant, disposition nor condition.
 
 ```py
 for:
   <for-clause>
 ```
 
-There's no real good way to imitate while-loops as a take on for-loops in Python without using stdlib like in `itertools`, which is completely fine in one-lining, however pure Python is always good. Recursion will not get you far really, not further than the recursion limit on your system. Use `itertools.cycle` for infinite sequences of cycling data.
+There's no real good way to imitate while-loops as a take on for-loops in pure Python without using stdlib like in `itertools`, which is completely fine in one-lining, however pure Python is always good. Recursion will not get you far really, not further than the recursion limit on your system. Use `itertools.cycle` for infinite sequences of cycling data.
 
 Exception handling is a bitch, here's an example of it from a socket-library that I made on my `python-one-liners` repository:
 
@@ -317,9 +317,9 @@ Exception handling is a bitch, here's an example of it from a socket-library tha
 )
 ```
 
-Yeah, there's no other real way to do it besides using `exec`, sorry. The most interesting thing there is the actual method I used for implementing a 'receive-all-data' method for a socket, using the UNIX signals and causing a `ZeroDivisionError` upon a certain timeout, hereafter unhanging the `self.socket.recv(ssize)` and returning back to the caller by the `return _buffer` which is quite genius if I say so for myself.
+There is no other way (that I know of) to do it besides using `exec`. The most interesting thing there is the actual method I used for implementing a 'receive-all-data' method for a socket, using the UNIX signals and causing a `ZeroDivisionError` upon a certain timeout, hereafter unhanging the `self.socket.recv(ssize)` and returning back to the caller by the `return _buffer` which is quite genius if I say so for myself.
 
-Lambdas are, in eyes of one-lining, simply a generalized sequence of array items (i.e. the parameters), with a return value which can be linked. I use them to simplify certain pieces of code, such as above, the `setvar`, `_inner_receive_all` and `_timeout` which would be impossible to do without in that certain code.
+Lambdas are, in eyes of one-lining, simply a generalized sequence of array items (i.e. due to the parameters), with a return value. I use them to simplify certain pieces of code, such as above, the `setvar`, `_inner_receive_all` and `_timeout` which would be impossible to do without in that certain code.
 You can technically use the `def` notation, but you wouldn't be able to use it to access any more than a regular `lambda` definition could.
 Imports are achieved by `__import__`, classes are also one-lineable by using `type(<name>, <bases>, <var-dict>)` or `import types` and `types.ClassType` with the same parameters.
 
@@ -327,7 +327,7 @@ One-line etiquette is as follows:
 
 - Don't use semicolons.
 - Only use `exec` for exception-handling.
-- If you're using it for obfuscation, the last thing that should be obfuscating it are the variable names, obfuscation comes from within the one-line's nature, if it doesn't, you aren't doing it well enough.
+- If you're using it for obfuscation, the last thing that should be obfuscating it is the syntax, obfuscation comes from within the one-line's nature, if it doesn't, you aren't doing it well enough.
 - Nobody likes boring code, encapsulate the stdlib, while/for-loops, lambdas, classes, multi-dimensional iteration, impure functionality, obscure control flow, anything and everything that isn't against one-line etiquette.
 - Sneak in an `__import__("this")` somewhere inside the code, for purposes of irony.
 
