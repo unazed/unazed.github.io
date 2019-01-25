@@ -350,6 +350,6 @@ issues:
 
 After a few hours of research into the x87 FP coprocessor, I looked at the writeup for the crackme and the only reason i got `ficompl`, is because I misaligned my disposition in the early stages, the RIP pointer wasn't supposed to point at the `add` instruction, rather the `ud2`, which seems retarded of me in hindsight, but I figured it was some algorithm.
 
-What a tard. I'll pick an easier crackme next time that doesn't involve signals.
+What a tard. I'll pick an easier crackme next time that doesn't involve signals. At least I learned more about the x87 implementation, GDB usage and UNIX signals, it was worth it I suppose.
 
 Thanks for reading.
