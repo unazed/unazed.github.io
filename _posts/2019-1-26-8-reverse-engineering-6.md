@@ -320,7 +320,9 @@ checkSerial (const char *input)
 }
 ```
 
-By this, we have the solution, we need a string of characters such that a character at some position `k` with ordinal `k_c` must also imply `k + 1` has ordinal `k_c + 1`, therefore a simple string such as `"abababababababab"` or `"abcdefghijklmnop'` would work:
+By this, we have the solution, we need a string of characters such that a character at some position `2k` with ordinal `2k_c` must also imply `2(k + 1)` has ordinal `2k_c + 1`, therefore a simple string such as `"abababababababab"` or `"abcdefghijklmnop'` would work:
+
+**EDITORIAL NOTE:** The positions are of a factor of `2` due to the line `acc += 2;`
 
 ```
 $4.4 DESKTOP-AVEP851@unazed ~ 255
