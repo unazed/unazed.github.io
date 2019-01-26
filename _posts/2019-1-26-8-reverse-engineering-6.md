@@ -3,7 +3,7 @@ layout: post
 title: reverse engineering crackme 6
 ---
 
-As rebound to the previous crackme which had in me complete intellectual disarray, I will be doing the crackme (here)[https://crackmes.one/crackme/5c2acb8933c5d46a3882b8d4], rated at difficulty 1, if I'm not able to finish this then the RE gods shan't have mercy on me.
+As rebound to the previous crackme which had in me complete intellectual disarray, I will be doing the crackme [here](https://crackmes.one/crackme/5c2acb8933c5d46a3882b8d4), rated at difficulty 1, if I'm not able to finish this then the RE gods shan't have mercy on me.
 
 ```assembly
    0x0000000008001226 <+0>:     push   %rbp
