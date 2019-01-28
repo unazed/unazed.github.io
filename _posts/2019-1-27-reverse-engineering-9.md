@@ -107,7 +107,7 @@ main (int argc, char **argv)
   char buffer[100]; // -0x90(%rbp)
   puts ("enter the magic string");
   fgets (buffer, 0x64, stdin);
-  if (strlen (buffer) != 11)
+  if (strlen (buffer) > 11)
     {
       puts ("too long...sorry no flag for you!!!");
       return 0;
@@ -149,7 +149,7 @@ main (int argc, char **argv)
   char buffer[100]; // -0x90(%rbp)
   puts ("enter the magic string");
   fgets (buffer, 0x64, stdin);
-  if (strlen (buffer) != 11)
+  if (strlen (buffer) > 11)
     {
       puts ("too long...sorry no flag for you!!!");
       return 0;
@@ -199,6 +199,71 @@ Now let's take a look at `strcat_str` because I have no idea whether it returns 
    0x00000000080011c9 <+84>:    retq
 ```
 
-So let's take a look, we initialize `f.2605` to `0x21`, move `0x1` to some `-0x4(%rbp)`, afterwards jumping to a comparison indicating a while-loop, there is a comparison ...
+So let's take a look, we initialize `f.2605` to `0x21`, move `0x1` to some `-0x4(%rbp)`, afterwards jumping to a comparison indicating a while-loop, there is a comparison on `+70` comparing `-0x4(%rbp)` by 9 and hereafter restarting the loop if `-0x4(%rbp) <= 0x9`, otherwise returning the pointer to the variable `f.2605`, the main loop is as follows:
 
-TBF
+```assembly
+   0x0000000008001189 <+20>:    mov    -0x4(%rbp),%eax
+   0x000000000800118c <+23>:    sub    $0x1,%eax
+   0x000000000800118f <+26>:    cltq
+   0x0000000008001191 <+28>:    lea    0x2ec8(%rip),%rdx        # 0x8004060 <f.2605>
+   0x0000000008001198 <+35>:    movzbl (%rax,%rdx,1),%eax
+   0x000000000800119c <+39>:    mov    %eax,%edx
+   0x000000000800119e <+41>:    mov    -0x4(%rbp),%eax
+   0x00000000080011a1 <+44>:    add    %edx,%eax
+   0x00000000080011a3 <+46>:    add    $0x1,%eax
+   0x00000000080011a6 <+49>:    mov    %eax,%ecx
+   0x00000000080011a8 <+51>:    mov    -0x4(%rbp),%eax
+   0x00000000080011ab <+54>:    cltq
+   0x00000000080011ad <+56>:    lea    0x2eac(%rip),%rdx        # 0x8004060 <f.2605>
+   0x00000000080011b4 <+63>:    mov    %cl,(%rax,%rdx,1)
+   0x00000000080011b7 <+66>:    addl   $0x1,-0x4(%rbp)
+```
+
+Translates to the following C code:
+
+```c
+char f_2605[9];
+
+char *
+strcat_str (void) // ?
+{
+  f_2605[0] = '!'; // (char)0x21
+  
+  int idx = 1;
+  while (idx <= 9)
+    {
+      f_2065[idx] = f_2605[idx - 1] + idx + 1;
+      ++idx;
+    }
+  return f_2605;
+}
+```
+
+Quite confusing control flow as it makes no intuitive sense, but yeah, let's run this through a Python interpeter:
+
+```py
+>>> def strcat_str():
+...   string = "!"
+...   idx = 1
+...   while idx <= 9:
+...     string += chr(ord(string[idx - 1]) + idx + 1)
+...     idx += 1
+...   return string
+...
+>>> strcat_str()
+'!#&*/5<DMW'
+```
+
+And in the C code this is encapsulated with `"flag is flag{...}"`, originally I set the `$rip` to after the jump to the return and this returned the same value, but I didn't think it was correct and so thought it was dependent on the input, but it seems that it is not, and so we have our flag `flag{!#&*/5<DMW}`, an example of correct input would be acquired by a sequence of characters of length 5 to 10 (inclusive) which sum to 990, (0x3e8 is 1000, but you need to include the newline which is 0xa):
+
+```assembly
+$4.4 DESKTOP-AVEP851@unazed ~ 0
+>./rev03
+enter the magic string
+cccccccccc
+flag is flag{!#&*/5<DMW}
+```
+
+Thanks for reading.
+
+
