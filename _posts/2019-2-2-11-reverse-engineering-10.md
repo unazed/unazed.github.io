@@ -4,7 +4,7 @@ title: reverse engineering crackme 10
 ---
 
 Although this is the tenth crackme, I don't intend to make it specialized as I don't see a point, it will be a traditional (recent) crackme located [here](https://crackmes.one/crackme/5c53840a33c5d475210bc6e9).
-The entry point is located in `_start` opposed to the standard libc-defined `main`:
+The user-defined entry point is located in `_start` opposed to the standard libc-defined `main`:
 
 ```assembly
    0x0000000000401000 <+0>:     mov    $0x1,%eax
@@ -235,7 +235,7 @@ And our relevant function prototype is:
 ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
 ```
 
-Which was quite a waste of time as we could've been able to derive this from the first call to the `file->f_op->read` but that's fine since now we need to delve into the implementation of this on the file structures that we're working with. Eventually, we get to the point where we have to figure out what `__fdget_light` does, as it has to retrieve the corresponding file structure for the stdout/stdin file-descriptors:
+Which was quite a waste of time as we could've been able to derive this from the first call to the `file->f_op->read` but that's fine since now we need to delve into the implementation of this on the file structures that we're working with. Eventually, we get to the point where we have to figure out what `__fget_light` does, as it has to retrieve the corresponding file structure for the stdout/stdin file-descriptors:
 
 ```c
 static unsigned long __fget_light(unsigned int fd, fmode_t mask)
@@ -266,7 +266,7 @@ static inline struct fd __to_fd(unsigned long v)
 }
 ```
 
-Which is much simpler, it uses the GNU extension where you cmay unpack multiple literals into a structure, otherwise zeroing the excess out, the we take some file-descriptor `v`, mask out the 2 LSBs, and put it in a `struct fd`:
+Which is much simpler, it uses the GNU extension where you may unpack multiple literals into a structure, otherwise zeroing the excess out, the we take some file-descriptor `v`, mask out the 2 LSBs, and put it in a `struct fd`:
 
 ```c
 struct fd {
