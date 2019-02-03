@@ -387,19 +387,20 @@ _IA64_REG_AR_EC
 
 Of which, I recognize the `EFLAG`; you may think I'm diving into the Linux internals a bit too far, by a long stretch, but I disagree as I believe it is quite educational in order to FULLY understand the return value of `read`:
 
-http://linuxcommand.org/lc3_man_pages/readh.html
-
 ```
-    Exit Status:
-    The return code is zero, unless end-of-file is encountered, read times out,
-    or an invalid file descriptor is supplied as the argument to -u.
+RETURN VALUE
+       On success, the number of bytes read is returned (zero indicates end of file), and the file position is advanced by this number.  It is not an error if this
+       number is smaller than the number of bytes requested; this may happen for example because fewer bytes are actually available right  now  (maybe  because  we
+       were close to end-of-file, or because we are reading from a pipe, or from a terminal), or because read() was interrupted by a signal.  See also NOTES.
+
+       On error, -1 is returned, and errno is set appropriately.  In this case, it is left unspecified whether the file position (if any) changes.
 ```
 
-Yeah, it returns zero if it errors, alright onto the rest of the decompilation:
+Yeah, it returns a subzero value if it errors, alright onto the rest of the decompilation:
 
 ```assembly
 write(1, "Please enter your name: \0", 25)
-if (!read(0, 0x402074, 32))
+if (read(0, 0x402074, 32) < 0)
 {
   _start_error ();
 }
@@ -444,6 +445,157 @@ Starting with:
    0x000000000040107e <+126>:   syscall
 ```
 
-`%rax` is 0, we add 6 to it, having `%r14` = 6, afterwards moving `%rax` into `%ds:0x402094` which was odd at first since the `ds` is implicit, so we place `0` into some location `0x402094`, thereafter moving `0x402074` into `*0x40209a`
+`%rax` is the length of the buffer, we add `0x6` to account for the eventual `"Hello "` we're going to prepend, `0x402019` contains `"Hello "`, `+87` was quite a weird instruction as the AT&T syntax doesn't make obvious that it's moving the whole byte-string into `%rax`, that is, our input into `%rax`, afterwards saving it at `0x40209a`, which is 6 bytes ahead of `0x402094`, hence appending it. Then we simply write it to the stdout:
 
-TBF
+```assembly
+   0x0000000000401080 <+128>:   mov    $0x1,%eax
+   0x0000000000401085 <+133>:   mov    $0x1,%edi
+   0x000000000040108a <+138>:   movabs $0x402020,%rsi
+   0x0000000000401094 <+148>:   mov    $0x16,%edx
+   0x0000000000401099 <+153>:   syscall
+```
+
+We then print `"Enter your password: "`:
+
+```assembly
+   0x000000000040109b <+155>:   mov    $0x0,%eax
+   0x00000000004010a0 <+160>:   mov    $0x0,%edi
+   0x00000000004010a5 <+165>:   movabs $0x402074,%rsi
+   0x00000000004010af <+175>:   mov    $0x20,%edx
+   0x00000000004010b4 <+180>:   syscall
+```
+
+Afterwards saving 32 bytes of password into `0x402074` which is interestingly also the username buffer. I notice at this point that the disassembly was cut short due to again the same thing that happened with the `_start.error` thing, the programmer of the crackme apparently didn't know how to make local labels:
+
+```assembly
+   0x0000000000401000 <_start+0>:       mov    $0x1,%eax
+   0x0000000000401005 <_start+5>:       mov    $0x1,%edi
+   0x000000000040100a <_start+10>:      movabs $0x402000,%rsi
+   0x0000000000401014 <_start+20>:      mov    $0x19,%edx
+   0x0000000000401019 <_start+25>:      syscall
+   0x000000000040101b <_start+27>:      mov    $0x0,%eax
+   0x0000000000401020 <_start+32>:      mov    $0x0,%edi
+   0x0000000000401025 <_start+37>:      movabs $0x402074,%rsi
+   0x000000000040102f <_start+47>:      mov    $0x20,%edx
+   0x0000000000401034 <_start+52>:      syscall
+   0x0000000000401036 <_start+54>:      cmp    $0x0,%rax
+   0x000000000040103a <_start+58>:      jl     0x401114 <_start.error>
+   0x0000000000401040 <_start+64>:      mov    %rax,%r14
+   0x0000000000401043 <_start+67>:      add    $0x6,%r14
+   0x0000000000401047 <_start+71>:      mov    0x402019,%rax
+   0x000000000040104f <_start+79>:      mov    %rax,0x402094
+   0x0000000000401057 <_start+87>:      mov    0x402074,%rax
+   0x000000000040105f <_start+95>:      mov    %rax,0x40209a
+   0x0000000000401067 <_start+103>:     mov    $0x1,%eax
+   0x000000000040106c <_start+108>:     mov    $0x1,%edi
+   0x0000000000401071 <_start+113>:     movabs $0x402094,%rsi
+   0x000000000040107b <_start+123>:     mov    %r14,%rdx
+   0x000000000040107e <_start+126>:     syscall
+   0x0000000000401080 <_start+128>:     mov    $0x1,%eax
+   0x0000000000401085 <_start+133>:     mov    $0x1,%edi
+   0x000000000040108a <_start+138>:     movabs $0x402020,%rsi
+   0x0000000000401094 <_start+148>:     mov    $0x16,%edx
+   0x0000000000401099 <_start+153>:     syscall
+   0x000000000040109b <_start+155>:     mov    $0x0,%eax
+   0x00000000004010a0 <_start+160>:     mov    $0x0,%edi
+   0x00000000004010a5 <_start+165>:     movabs $0x402074,%rsi
+   0x00000000004010af <_start+175>:     mov    $0x20,%edx
+   0x00000000004010b4 <_start+180>:     syscall
+   0x00000000004010b6 <_start+182>:     mov    %rax,%r15
+   0x00000000004010b9 <_start+185>:     dec    %r15
+   0x00000000004010bc <_start.l1+0>:    mov    %r15,%r14
+   0x00000000004010bf <_start.l1+3>:    add    $0x5,%r14
+   0x00000000004010c3 <_start.l1+7>:    mov    0x402094(%r14),%al
+   0x00000000004010ca <_start.l1+14>:   add    $0x5,%al
+   0x00000000004010cc <_start.l1+16>:   cmp    0x402073(%r15),%al
+   0x00000000004010d3 <_start.l1+23>:   jne    0x4010f7 <_start.wrong>
+   0x00000000004010d5 <_start.l1+25>:   dec    %r15
+   0x00000000004010d8 <_start.l1+28>:   jne    0x4010bc <_start.l1>
+   0x00000000004010da <_start.l1+30>:   mov    $0x1,%eax
+   0x00000000004010df <_start.l1+35>:   mov    $0x1,%edi
+   0x00000000004010e4 <_start.l1+40>:   movabs $0x402053,%rsi
+   0x00000000004010ee <_start.l1+50>:   mov    $0x18,%edx
+   0x00000000004010f3 <_start.l1+55>:   syscall
+   0x00000000004010f5 <_start.l1+57>:   jmp    0x40111c <_start.exit>
+   0x00000000004010f7 <_start.wrong+0>: mov    $0x1,%eax
+   0x00000000004010fc <_start.wrong+5>: mov    $0x1,%edi
+   0x0000000000401101 <_start.wrong+10>:        movabs $0x402036,%rsi
+   0x000000000040110b <_start.wrong+20>:        mov    $0x18,%edx
+   0x0000000000401110 <_start.wrong+25>:        syscall
+   0x0000000000401112 <_start.wrong+27>:        jmp    0x40111c <_start.exit>
+   0x0000000000401114 <_start.error+0>: mov    %rax,0x402070
+   0x000000000040111c <_start.exit+0>:  mov    $0x3c,%eax
+   0x0000000000401121 <_start.exit+5>:  movabs $0x402070,%rdi
+   0x000000000040112b <_start.exit+15>: syscall
+```
+
+So, let's start with:
+
+```assembly
+   0x00000000004010b6 <_start+182>:     mov    %rax,%r15
+   0x00000000004010b9 <_start+185>:     dec    %r15
+   
+   0x00000000004010bc <_start.l1+0>:    mov    %r15,%r14
+   0x00000000004010bf <_start.l1+3>:    add    $0x5,%r14
+   0x00000000004010c3 <_start.l1+7>:    mov    0x402094(%r14),%al
+   0x00000000004010ca <_start.l1+14>:   add    $0x5,%al
+   0x00000000004010cc <_start.l1+16>:   cmp    0x402073(%r15),%al
+   0x00000000004010d3 <_start.l1+23>:   jne    0x4010f7 <_start.wrong>
+   0x00000000004010d5 <_start.l1+25>:   dec    %r15
+   0x00000000004010d8 <_start.l1+28>:   jne    0x4010bc <_start.l1>
+   0x00000000004010da <_start.l1+30>:   mov    $0x1,%eax
+   0x00000000004010df <_start.l1+35>:   mov    $0x1,%edi
+   0x00000000004010e4 <_start.l1+40>:   movabs $0x402053,%rsi
+   0x00000000004010ee <_start.l1+50>:   mov    $0x18,%edx
+   0x00000000004010f3 <_start.l1+55>:   syscall
+```
+
+We initialize `%r15` to the length of the password and decrement it by 1 to account for the `\n`, afterwards we add 5 to the length and index the string `0x402094` which is the full `"Hello <username>"`, so essentially we index the last characters and palce them in `%al`, hereafter adding 5 to their ordinal, and comparing it to some string at `0x402073` which is a null-byte, but is proceeded by the password we are given.
+Hence `0x402073(%r15)` where `%r15` is the length of the string minus one, is going to be the last non-newline character, and so if the username isn't the same as the last character of the password:
+
+```c
+char username[32];
+char password[32];
+fgets (username, sizeof (username), stdin);
+fgets (password, sizeof (password), stdin);
+size_t pw_length = strlen (password) - 1;
+char hello[15];
+sprintf (hello, "Hello %s", username);
+
+username[8] = password[8] = 0; // the strings are shortsized due to the %rax moves
+
+do {
+  if ( (hello[pw_length + 5] + 5) != password[pw_length-1])
+    {
+      puts ("\033[31mWrong Credentials, GTFO");
+      _start_error ();
+    }
+  --pw_length;
+} while (pw_length);
+```
+
+And so, we have to craft a username buffer whose characters are rotated by 5 characters to the right of the equivalent password character, or something along those lines:
+
+```py
+def generate_password(username):
+  return ''.join(chr(ord(char)+5) for char in username)
+```
+
+For example, let's try `"una3ed"`:
+
+```py
+>>> gen_pw("una3ed")
+'zsf8ji'
+[...]
+>./hello
+Please enter your name:  una3ed
+Hello una3ed
+Enter your Password:  zsf8ji
+Great H4x0r Skillz!
+```
+
+Tada!
+
+Thanks for reading.
+
+  
