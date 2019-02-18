@@ -15,11 +15,11 @@ Now to begin, this isn't structured at all really, but it does give some general
 A set is an aggregation of distinct objects, those of which cannot be the set itself:
 That is, let `S` be a set of arbitrary elements to size `i`, i.e.:
 
-$ S = \{a_0, a_1, ..., a_i\} $ 
+$ S = \\{a_0, a_1, ..., a_i\\} $ 
 
 In set notation, we may self-define the set as:
 
-$\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}$
+\[\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}\]
 
 For any arbitrary elements, `s_a` and `s_b` of the set S, the set S is defined as having elements which are distinct (`s_a` != `s_b`), and that the element `s_a` is not the set itself, i.e. a set S cannot be `S = {1, S}`
 
