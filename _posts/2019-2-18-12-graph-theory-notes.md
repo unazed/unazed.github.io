@@ -19,7 +19,7 @@ $ S = \{a_0, a_1, ..., a_i\} $
 
 In set notation, we may self-define the set as:
 
-$\forall s_a, s_b \in S: S = \{s_a | s_a \neq S \land s_a \neq s_b\}$
+$\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}$
 
 For any arbitrary elements, `s_a` and `s_b` of the set S, the set S is defined as having elements which are distinct (`s_a` != `s_b`), and that the element `s_a` is not the set itself, i.e. a set S cannot be `S = {1, S}`
 
