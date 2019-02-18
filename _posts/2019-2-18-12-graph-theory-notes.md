@@ -83,8 +83,7 @@ The degree property of a certain vertex is the amount of edges incident to it, i
 
 The amount of 'pieces' that a graph has is defined as the amount of disjoint graphs that are not connected to other structures, i.e.:
 
-$v: \{A, B, C, D, E, F, G, H\}$
-$e: \{\{A,B\}, \{B, D\}, \{D, C\}, \{C, A\}, \{E, F\}, \{F, H\}, \{H, G\}, \{G, E\}\}$
+$$v: \{A, B, C, D, E, F, G, H\} \\ e: \{\{A,B\}, \{B, D\}, \{D, C\}, \{C, A\}, \{E, F\}, \{F, H\}, \{H, G\}, \{G, E\}\}$$
 
 Which are essentially two graphs of $C_4$ (which is not a related property for graphs to be disjoint). However, this graph is in two pieces, as the cyclic graph EFHG has no incidence/adjacency with ABDC. And so, in order for another graph H to be isomorphic to graph G, it must at least follow the properties:
 
