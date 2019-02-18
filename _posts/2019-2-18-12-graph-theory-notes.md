@@ -15,11 +15,11 @@ Now to begin, this isn't structured at all really, but it does give some general
 A set is an aggregation of distinct objects, those of which cannot be the set itself:
 That is, let `S` be a set of arbitrary elements to size `i`, i.e.:
 
-$ S = \\{a_0, a_1, ..., a_i\\} $ 
+$$S = \{a_0, a_1, ..., a_i\}$$
 
 In set notation, we may self-define the set as:
 
-$$\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}$$
+$$\forall s_a, s_b \in S: S = \{s_a | s_a \neq S \land s_a \neq s_b\}$$
 
 For any arbitrary elements, `s_a` and `s_b` of the set S, the set S is defined as having elements which are distinct (`s_a` != `s_b`), and that the element `s_a` is not the set itself, i.e. a set S cannot be `S = {1, S}`
 
@@ -46,7 +46,7 @@ And so, 2b^2 = a^2, we may set a = 2k, and acquire 2b^2 = 4k^2, thence simplify,
 Russell's paradox works off the definition of a set as merely a collection of distinct objects, categorized into two types of sets, ordinary and extraordinary. An ordinary set is not an element of itself, that is, A = {1, A} is not an ordinary set whereas A = {1, 2, 3} is, however A = {1, A} is an extraordinary set.
 Now define a set which contains all ordinary sets as U, that is, if U does not contain itself, it implies that U is in U as it is an ordinary set, and hence U must be of itself, but then this implies that U is an extraordinary set, as it contains itself, however contrary to the definition that U is a set which contains ordinary sets.
 
-$U = {x | x \nin x}, \therefore R \in R \implies R \notin R$
+$$U = {x | x \nin x}, \therefore R \in R \implies R \notin R$$
 
 To resolve this, we define U as a non-set, rather a class, as if U was a set it would mean that it is a set of itself, therefore leading to the above paradox.
 
@@ -159,7 +159,7 @@ Euler's formula for graphs was that for any planar connected graph, the equation
 
 Euler's formula additionally proves that non-polygonal, connected and planar graphs also follow v + f - e = 2, and so do simply any planar and connected graphs. A useful consequence from the Euler's formula is the inequality:
 
-$\frac{3f}{2} <= e <= 3v - 6$
+$$\frac{3f}{2} <= e <= 3v - 6$$
 
 To derive this, we must prove that for any connected planar graph with v >= 3 that (3/2)f <= e, first note that the minimum number of vertices required to define bounds for a face is 3, with a closed curve across the vertices, however we may use any other amount of vertices beyond 3 as long as it is cyclic.
 Also note that a C_4 graph bounds the internal face by 4 edges, and the outside face also by 4 edges, so in total we bind 2 faces with  8 edges, hence observe the inequality:
