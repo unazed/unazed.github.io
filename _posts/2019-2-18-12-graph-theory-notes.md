@@ -3,7 +3,7 @@ layout: post
 title: graph theory notes
 ---
 
-Below are the notes I'd taken from a week's worth of learning graph theory using both online resources and a book I'd bought named `Introduction to graph theory` by Richard Trudeau, which is an amazing book for idiots like me, since it manages an equilibrium between intuitive and managing to be somewhat rigorous.
+Below are the notes I'd taken from a week's worth of learning graph theory using both online resources and a book I'd bought named `Introduction to graph theory` by Richard Trudeau, which is an amazing book for people such as me, since it manages an equilibrium between intuitive and managing to be somewhat rigorous.
 
 Graph theory itself is the study of data structures, not the specific algorithms themselves per se, however the intrinsicities and, conversely, the broader details of certain structures such as spanning trees, bipartities, cycles, and in general any form of graph which has any special property. It limits itself to two primitive concepts, the edge(s) and the vert{ex}{ices}, the edges can be thought of as functions or interrelations between vertices, the vertices can be thought of as datum, or a significant point in a certain algorithm, e.g., the start and end point in a closed Hamiltonian walk; the edges themselves may come in various qualities and quantities, an edge may be directed, this sort of graph would be called a digraph (directed-graph), it may have a weight associated to it, e.g.: a cost of travelling across it, a length, or any sort of traversal cost, this graph would be called a weighted graph.
 Graphs whose vertices have multiple edges adjacent to the same other adjacent vertex, is called a multigraph, relevant in scenarios where you are trying to derive a dual graph, wish to be able to cross an edge more than once (in a walk, say), or in a double-y linked list. There is also a connection wherein the vertex will connect to itself, called a loop, in this case the graph would be considered a pseudo-graph.
@@ -19,7 +19,7 @@ $ S = \\{a_0, a_1, ..., a_i\\} $
 
 In set notation, we may self-define the set as:
 
-\[\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}\]
+$$\forall s_a, s_b \in S: S = \\{s_a | s_a \neq S \land s_a \neq s_b\\}$$
 
 For any arbitrary elements, `s_a` and `s_b` of the set S, the set S is defined as having elements which are distinct (`s_a` != `s_b`), and that the element `s_a` is not the set itself, i.e. a set S cannot be `S = {1, S}`
 
