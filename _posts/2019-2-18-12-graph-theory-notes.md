@@ -27,7 +27,7 @@ A set's elements may not be integral, as it may be any abstract object.
 
 A set with no defined elements, is defined as an empty/null-set.
 
-A set `A` is a subset of set `B` iff \forall a \in A: (a \in B), note that the subset operator is non-commutative as \forall a \in A: (a \in B) does not imply $\forall b \in B: (b in A)$.
+A set `A` is a subset of set `B` iff $\forall a \in A: (a \in B)$, note that the subset operator is non-commutative as $\forall a \in A: (a \in B)$ does not imply $\forall b \in B: (b in A)$.
 Every set is a subset of itself, as $\forall a \in A: (a \in A)$ is intuitively satisfied.
 The empty set is a subset of all sets, including itself.
 
@@ -39,7 +39,7 @@ An empty set is a unique set to its name, let A and B be empty sets, as A contai
 Let AB, CD and XY be three finite lines, and define XY as a measure such that if we repeated the line XY `m` times, we will get the length of line AB, and respectively, if we laid out the line XY `n` times, we will get the length of line CD. That is, line XY = AB/m and XY = CD/n, so m*XY = AB, n*XY = CD, so AB/CD = (m*XY)/(n*XY) = m/n, implying that the ratio between the two lines is rational, however take the example AB = 1, CD = 1, and so deriving that the distance between the lines if they were perpendicular to each other, would be sqrt(2), therefore implying that sqrt(2) = m/n, which implies that sqrt(2) is rational.
 Take sqrt(2) = a/b, thence square, 2 = a^2/b^2, isolate a^2, 2b^2 = a^2, as we can see, `a` must be an even number as its square has a factor of 2, proven by:
 
-take some even `a`, represented as `2b`, hence square, `4b^2`, implying that the square of all even numbers has a divisor of 4, which we can trivially prove for say a \in {2, 4, 6, 8} => {4, 16, 36, 64}, divided by 4 yields {1, 4, 9, 16}, as 4 is the prime factorization 2*2, we can see that therefore all squares of a number whose factors contain 2 will also have a factor of 2 in its square.
+take some even `a`, represented as `2b`, hence square, `4b^2`, implying that the square of all even numbers has a divisor of 4, which we can trivially prove for say $a \in \{2, 4, 6, 8\}: \{4, 16, 36, 64\}$, divided by 4 yields {1, 4, 9, 16}, as 4 is the prime factorization 2*2, we can see that therefore all squares of a number whose factors contain 2 will also have a factor of 2 in its square.
 
 And so, 2b^2 = a^2, we may set a = 2k, and acquire 2b^2 = 4k^2, thence simplify, b^2 = 2k^2, then simplify for b = 2m, 4m^2 = 2k^2, 2m^2 = k^2, and continue until we have run out of symbols, this is a never-ending cycle of reduction shows that the sqrt(2) is unable to be represented in the form a/b for whole numbers a, b in its simplest form, as we wil find ourselves in a loop.
 
@@ -82,9 +82,6 @@ Conclusively, the number of vertices and edges must be preserved across isomorph
 The degree property of a certain vertex is the amount of edges incident to it, i.e., the amount of sets in the edge-set containing the vertex.
 
 The amount of 'pieces' that a graph has is defined as the amount of disjoint graphs that are not connected to other structures, i.e.:
-
-
-+
 
 v: {A, B, C, D, E, F, G, H}
 e: {{A,B}, {B, D}, {D, C}, {C, A}, {E, F}, {F, H}, {H, G}, {G, E}}
