@@ -46,7 +46,7 @@ And so, 2b^2 = a^2, we may set a = 2k, and acquire 2b^2 = 4k^2, thence simplify,
 Russell's paradox works off the definition of a set as merely a collection of distinct objects, categorized into two types of sets, ordinary and extraordinary. An ordinary set is not an element of itself, that is, A = {1, A} is not an ordinary set whereas A = {1, 2, 3} is, however A = {1, A} is an extraordinary set.
 Now define a set which contains all ordinary sets as U, that is, if U does not contain itself, it implies that U is in U as it is an ordinary set, and hence U must be of itself, but then this implies that U is an extraordinary set, as it contains itself, however contrary to the definition that U is a set which contains ordinary sets.
 
-$$U = {x | x \nin x}, \therefore R \in R \implies R \notin R$$
+$$U = \{x | x \notin x\}, \therefore R \in R \implies R \notin R$$
 
 To resolve this, we define U as a non-set, rather a class, as if U was a set it would mean that it is a set of itself, therefore leading to the above paradox.
 
@@ -130,7 +130,7 @@ Kuratowski's theorem proves that the set of all nonplanar graphs is equal to set
 
 1) To prove that a graph with v = 5, e = 3, will always have at least two adjacent edges, we must consider that an edge will occupy at least 2 points, if the edges were separate then it would mean we would have v = 6, as 3 * 2 = 6, however if we were to have at least two edges adjacent we would only use 3 points, hence the third edge will occupy 2 points, and 3 + 2 = 5, therefore a graph of v = 5, e = 3 will have at least 2 adjacent edges to satisfy the v.
 
-A walk across a graph is a sequence of vertices (not necessarily distinct) such that A_1, A_2, A_3, ..., A_n are all consecutive and/or equal vertices to the prior. The walk A_1 to A_n is considered to join A_1 and A_n.
+A walk across a graph is a sequence of vertices (not necessarily distinct) such that $A_1, A_2, A_3, ..., A_n$ are all consecutive and/or equal vertices to the prior. The walk A_1 to A_n is considered to join A_1 and A_n.
 
 A graph is connected if each vertex in the vertex-set has a place in the edge-set, i.e., each vertex is incident to an edge. Otherwise, the graph is disconnected. N_1 is connected, because the definition of connection is so that each two vertices, A, B imply there is a subset {A, B} in the edge-set, however, by the law of the excluded middle, an N_1 graph has no two vertices, and therefore cannot be not disconnected as there are no two vertices to be disconnected; and so, it is connected. However, all other N_n for n > 1 are disconnected for the same logic.
 All cyclic graphs C_n are connected, and all k-regular graphs K_n are connected.
@@ -143,23 +143,23 @@ A graph is defined as polygonal if it is planar, connected and each edge borders
 Euler's formula for graphs was that for any planar connected graph, the equation v + f - e = 2 always held true. This is provable using inductive reasoning:
 
 (a)	Let `f` be the subject of the inductive proof that v + f - e = 2 for all `f`, hence to test the base case: for f = 1, take a polygon N_1 (this is polygonal as it does not have enough edges to be considered non-polygonal, as per the law of the excluded middle, and it is connected, due to the same reasoning, it is also obviously planar), with v=1 e=0, then 1 + 1 - 0 = 2 holds true
-(b) 	Hence, if v + f - e = 2 for some `k = 1`, then allow us to prove that it holds for `k + 1`, suppose graphs G and H, where:
-		- H_f = G_f + 1
-		- H_e - G_e = x
-		- H_v - G_v = x - 1
+(b) 	Hence, if $v + f - e = 2$ for some `k = 1`, then allow us to prove that it holds for `k + 1`, suppose graphs G and H, where:
+		- $H_f = G_f + 1$
+		- $H_e - G_e = x$
+		- $H_v - G_v = x - 1$
 	Therefore, to set H_??? as the subjects:
-		- H_f = G_f + 1
-		- H_e = x + G_e
-		- H_v = G_v + x - 1
+		- $H_f = G_f + 1$
+		- $H_e = x + G_e$
+		- $H_v = G_v + x - 1$
 	And to finally substitute:
-		1) G_v + G_f - G_e 	= H_v + H_f - H_e 			= 2
-		2) G_v + G_f - G_e 	= (G_v + x - 1) + (G_f + 1) - (G_e + x) = 2
-					= G_v + x - 1 + G_f +  1 - G_e - x	= 2
-		   G_v + G_f - G_e	= G_v + G_f - G_e			= 2
+		1) $G_v + G_f - G_e$ 	= $_v + H_f - H_e$ 			  = 2
+		2) $G_v + G_f - G_e$ 	= $(G_v + x - 1) + (G_f + 1) - (G_e + x)$ = 2
+					= $G_v + x - 1 + G_f +  1 - G_e - x$	  = 2
+		   $G_v + G_f - G_e$	= $G_v + G_f - G_e$			  = 2
 
 Euler's formula additionally proves that non-polygonal, connected and planar graphs also follow v + f - e = 2, and so do simply any planar and connected graphs. A useful consequence from the Euler's formula is the inequality:
 
-$$\frac{3f}{2} <= e <= 3v - 6$$
+$$\frac{3f}{2} \leq e \leq 3v - 6$$
 
 To derive this, we must prove that for any connected planar graph with v >= 3 that (3/2)f <= e, first note that the minimum number of vertices required to define bounds for a face is 3, with a closed curve across the vertices, however we may use any other amount of vertices beyond 3 as long as it is cyclic.
 Also note that a C_4 graph bounds the internal face by 4 edges, and the outside face also by 4 edges, so in total we bind 2 faces with  8 edges, hence observe the inequality:
@@ -174,6 +174,6 @@ This graph has 5 edges, and 4 vertices, it is planar, closed and creates three f
 	3 <= 3
 	3 <= 4
 To simplify:
-	3*3 <= (3 + 3 + 4) ... 9 <= 10
-And so, an intuition is that our inequality 3f <= 2e uses the duality of edges to define boundedness, and hence set restraints relative to the faces vs. edges.
+	$3*3 \leq (3 + 3 + 4) ... 9 \leq 10$
+And so, an intuition is that our inequality $3f \leq 2e$ uses the duality of edges to define boundedness, and hence set restraints relative to the faces vs. edges.
 {% endraw %}
