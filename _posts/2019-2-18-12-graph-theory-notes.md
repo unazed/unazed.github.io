@@ -10,6 +10,8 @@ Graphs whose vertices have multiple edges adjacent to the same other adjacent ve
 
 Now to begin, this isn't structured at all really, but it does give some general notions, and necessary derivations.
 
+{% raw %}
+
 A set is an aggregation of distinct objects, those of which cannot be the set itself:
 That is, let `S` be a set of arbitrary elements to size `i`, i.e.:
 
@@ -177,3 +179,4 @@ This graph has 5 edges, and 4 vertices, it is planar, closed and creates three f
 To simplify:
 	3*3 <= (3 + 3 + 4) ... 9 <= 10
 And so, an intuition is that our inequality 3f <= 2e uses the duality of edges to define boundedness, and hence set restraints relative to the faces vs. edges.
+{% endraw %}
