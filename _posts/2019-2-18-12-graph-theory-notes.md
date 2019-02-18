@@ -15,11 +15,11 @@ Now to begin, this isn't structured at all really, but it does give some general
 A set is an aggregation of distinct objects, those of which cannot be the set itself:
 That is, let `S` be a set of arbitrary elements to size `i`, i.e.:
 
-	$S = \{a_0, a_1, ..., a_i\}$
+$S = \{a_0, a_1, ..., a_i\}$
 
 In set notation, we may self-define the set as:
 
-	$\forall s_a, s_b \in S: S = \{s_a | s_a \neq S \land s_a \neq s_b\}$
+$\forall s_a, s_b \in S: S = \{s_a | s_a \neq S \land s_a \neq s_b\}$
 
 For any arbitrary elements, `s_a` and `s_b` of the set S, the set S is defined as having elements which are distinct (`s_a` != `s_b`), and that the element `s_a` is not the set itself, i.e. a set S cannot be `S = {1, S}`
 
@@ -39,14 +39,14 @@ An empty set is a unique set to its name, let A and B be empty sets, as A contai
 Let AB, CD and XY be three finite lines, and define XY as a measure such that if we repeated the line XY `m` times, we will get the length of line AB, and respectively, if we laid out the line XY `n` times, we will get the length of line CD. That is, line XY = AB/m and XY = CD/n, so m*XY = AB, n*XY = CD, so AB/CD = (m*XY)/(n*XY) = m/n, implying that the ratio between the two lines is rational, however take the example AB = 1, CD = 1, and so deriving that the distance between the lines if they were perpendicular to each other, would be sqrt(2), therefore implying that sqrt(2) = m/n, which implies that sqrt(2) is rational.
 Take sqrt(2) = a/b, thence square, 2 = a^2/b^2, isolate a^2, 2b^2 = a^2, as we can see, `a` must be an even number as its square has a factor of 2, proven by:
 
-	take some even `a`, represented as `2b`, hence square, `4b^2`, implying that the square of all even numbers has a divisor of 4, which we can trivially prove for say a \in {2, 4, 6, 8} => {4, 16, 36, 64}, divided by 4 yields {1, 4, 9, 16}, as 4 is the prime factorization 2*2, we can see that therefore all squares of a number whose factors contain 2 will also have a factor of 2 in its square.
+take some even `a`, represented as `2b`, hence square, `4b^2`, implying that the square of all even numbers has a divisor of 4, which we can trivially prove for say a \in {2, 4, 6, 8} => {4, 16, 36, 64}, divided by 4 yields {1, 4, 9, 16}, as 4 is the prime factorization 2*2, we can see that therefore all squares of a number whose factors contain 2 will also have a factor of 2 in its square.
 
 And so, 2b^2 = a^2, we may set a = 2k, and acquire 2b^2 = 4k^2, thence simplify, b^2 = 2k^2, then simplify for b = 2m, 4m^2 = 2k^2, 2m^2 = k^2, and continue until we have run out of symbols, this is a never-ending cycle of reduction shows that the sqrt(2) is unable to be represented in the form a/b for whole numbers a, b in its simplest form, as we wil find ourselves in a loop.
 
 Russell's paradox works off the definition of a set as merely a collection of distinct objects, categorized into two types of sets, ordinary and extraordinary. An ordinary set is not an element of itself, that is, A = {1, A} is not an ordinary set whereas A = {1, 2, 3} is, however A = {1, A} is an extraordinary set.
 Now define a set which contains all ordinary sets as U, that is, if U does not contain itself, it implies that U is in U as it is an ordinary set, and hence U must be of itself, but then this implies that U is an extraordinary set, as it contains itself, however contrary to the definition that U is a set which contains ordinary sets.
 
-	$U = {x | x \nin x}, \therefore R \in R \implies R \notin R$
+$U = {x | x \nin x}, \therefore R \in R \implies R \notin R$
 
 To resolve this, we define U as a non-set, rather a class, as if U was a set it would mean that it is a set of itself, therefore leading to the above paradox.
 
@@ -113,10 +113,10 @@ A supergraph A of some graph B is one from B such that augmentation is applied, 
 
 A method of proving planarity of a graph, is by making an assumption that it is planar and hence disproving it, or the converse. For example take a K_5 graph where the bottom-most edge is split in the middle by another vertex, this is not isomorphic to the K_5 graph because it has an extra edge and vertex, therefore it is neither a supergraph (subgraphs of isomorphisms are isomorphic to the supergraph), but if we took this as the original figure, and wanted to prove that it was nonplanar, then take the following steps:
 
-	(a) Assume it is planar
-	(b) Remove the bottom vertex, and combine the two edges, into one (creating K_5). This graph is not a subgraph of the first graph, and it is neither isomorphic. However, our augmentation of the graph did not make it any less planar than we assumed it to be to begin with, because we erased an edge, which cannot possibly make something nonplanar.
-	(c) By this, we say that K_5 is planar, which is obviously untrue as it is provable that K_5 is nonplanar, and hence the augmentation from some graph to the graph K_5 whilst performing a planar augmentation can lead to proving that the graph is nonplanar by contradiction
-	(d) Therefore, the original graph is nonplanar
+(a) Assume it is planar
+(b) Remove the bottom vertex, and combine the two edges, into one (creating K_5). This graph is not a subgraph of the first graph, and it is neither isomorphic. However, our augmentation of the graph did not make it any less planar than we assumed it to be to begin with, because we erased an edge, which cannot possibly make something nonplanar.
+(c) By this, we say that K_5 is planar, which is obviously untrue as it is provable that K_5 is nonplanar, and hence the augmentation from some graph to the graph K_5 whilst performing a planar augmentation can lead to proving that the graph is nonplanar by contradiction
+(d) Therefore, the original graph is nonplanar
 
 An expansion of a graph G is an addition of vertices to the graph of order two, analogous to cutting an edge into two edges with intermittent incidence into a point. A supergraph is however asimilar to expansion, as a supergraph cannot splice edges into two as that would unpreserve the original structure of the graph, and hence declining the property of subsettance from the subset into the supergraph. However, an expansion does do this, but it also preserves the planarity of the original graph, however not the structure, whereas a supergraph may introduce nonplanarity (never planarity from nonplanarity).
 An intuitive example is to take the graphs C_4 and K_3, C_4 is not isomorphic to K_3 therefore it cannot be a subset of it, nor can K_3 be a subset of C_4 due to the same property of anisomorphism, this implies that no supergraph of K_3 nor C_4 could ever be isomorphic to one another, as it would involve changing the intrinsic internal structure.
@@ -162,7 +162,7 @@ Euler's formula for graphs was that for any planar connected graph, the equation
 
 Euler's formula additionally proves that non-polygonal, connected and planar graphs also follow v + f - e = 2, and so do simply any planar and connected graphs. A useful consequence from the Euler's formula is the inequality:
 
-	(3/2)f <= e <= 3v - 6
+$\frac{3f}{2} <= e <= 3v - 6$
 
 To derive this, we must prove that for any connected planar graph with v >= 3 that (3/2)f <= e, first note that the minimum number of vertices required to define bounds for a face is 3, with a closed curve across the vertices, however we may use any other amount of vertices beyond 3 as long as it is cyclic.
 Also note that a C_4 graph bounds the internal face by 4 edges, and the outside face also by 4 edges, so in total we bind 2 faces with  8 edges, hence observe the inequality:
