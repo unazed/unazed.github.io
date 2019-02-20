@@ -61,7 +61,7 @@ A graph, by the definition of sets, may not have looped vertices (i.e. edge sets
 
 A graph's edges are undirected, i.e. an edge-set {{a, b}, {b, c}} does not imply that the vertex a is forwardly connected to the vertex b, nor the converse, as there is no explicit direction due to the fact that {a, b} = {b, a}, a directed graph whose order matters is called a digraph.
 
-A common graph occurrence is one called a cyclic graph, denoted by the notation $C_v$, for $v \geq 3$, defined as having vertex set $\{1, 2, 3, ..., v\}$ and edge set $\{\{1, 2\}, \{3, 4\}, ..., \{(v-1), v\}, \{v, 1\}\}$, which connects back to itself, hence cyclic.
+A common graph occurrence is one called a cyclic graph, denoted by the notation $C_v$, for $v \geq 3$, defined as having vertex set $\{1, 2, 3, ..., v\}$ and edge set {{1, 2}, {3, 4}, ..., {(v-1), v}, {v, 1}}, which connects back to itself, hence cyclic.
 Another graph, called the null-graph, is one that has no edges, denoted as N_v, having edge-set {}, and vertex set {1, 2, 3, ..., v} for v >= 1, as a graph must have a nonzero vertex set implying N_1 is the trivial graph.
 Another graph, called K_v for v >= 1 has vertex set {1, 2, 3, ..., v} and an edge-set with all possible edges producible from the vertex set.
 
