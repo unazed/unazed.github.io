@@ -1,6 +1,6 @@
 ---
 layout: post
-title: reverse engineering 11
+title: reverse engineering crackme 11
 ---
 
 After a slight hiatus from the topic of reverse engineering, and computer science as a whole (more tended towards focusing on pure mathematics and my own education), I return with [this](https://crackmes.one/crackme/5ca0b3f833c5d4419da5567a) crackme, it is one made in C++ and I don't really want to use a decompiler since that's for skids (ref. to fundamental theorem of skid psychology [here](https://unazed.github.io/7-skid-psych-1/)).
