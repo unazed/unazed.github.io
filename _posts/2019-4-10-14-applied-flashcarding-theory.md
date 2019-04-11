@@ -18,6 +18,7 @@ title: applied flashcarding theory for skids
 1.1: motivation behind the dissertation
 2.1: Luminous
 2.2: Zakaria
+2.3: Allan
 ```
 
 <h2><b>0.3 foreword</b></h2>
@@ -167,3 +168,39 @@ int main(){
 Ezio here humbly questions zakaria regarding the differences between typedefs and macros, and zakaria calls it "trivial" (derived from the average mathematical textbook) which is a sign of immediate skiddiness as it implies zakaria is not mature enough as an intellectual to be able to not feel challenged whenever he is approached with a question. Note (1) is a pathetic attempt to flashcard Ezio with a nonsensical question (and the recurrence of the adjective, 'trivial').
 Both of these flashcarding attempts are categorized under explicit flashcarding, as the flashcard is obviously stated under an egotistic pretense, purely to benefit his ego and not to answer anything unknown.
 It's sad as fuck.
+
+<h2><b>Allan</b></h2>
+
+From the 5 seconds I took to overview what I thought of Allan, the immediate adjective came to mind, pseudo-intellectual. He is a skid in late development with ability to recognize potentially skiddy behaviour, but too clear and obvious motives which can be dismissed by somebody with more experience (myself, viz. below).
+
+```
+[9:23 AM] allan: @mov %eax, %r0 holy shit you must be a special snowflake if you are a coder :flushed:
+[9:24 AM] allan: damn man i respect you
+[9:24 AM] mov %eax, %r0: you're a skid don't @ me
+[9:24 AM] allan: :heart_exclamation: damnnn
+[9:24 AM] allan: and you are not
+[9:24 AM] allan: cause you tha real coder
+[9:24 AM] allan: :sunglasses:
+[9:24 AM] allan: :flushed:
+[9:25 AM] mov %eax, %r0: since clearly you're a funny quirky memer that has a hidden agenda of flexing on niggas
+[9:25 AM] mov %eax, %r0: take a read https://unazed.github.io/14-applied-flashcarding-theory/
+[9:26 AM] allan: no im not gonna read that
+[9:26 AM] allan: smArtAss
+[9:26 AM] allan: @mov %eax, %r0 you must be the superior intellectual :spy:
+[9:27 AM] mov %eax, %r0: sounds like a plan
+[9:27 AM] allan: nigger cattle
+[9:28 AM] allan: you even shove it in ur name to let everyone know you are the big deal :sunglasses:
+[9:28 AM] mov %eax, %r0: who r u
+[9:28 AM] mov %eax, %r0: don't u have school to be attending or smth to get on with in life
+[9:29 AM] allan: i am in school
+[9:29 AM] allan: what productive do you do mister
+(1) [9:29 AM] allan: let everyone know you code and call them a skid :sunglasses: ?
+[9:30 AM] allan: thats a stereotypical nigger cattle man
+[9:30 AM] mov %eax, %r0: idk man i just flex on niggas unwittingly since i don't have anything to show for it bro
+[9:32 AM] allan: dont u have any interesting talents
+```
+
+It seems that my setting of my name to a pseudo-x86/ARM instruction has invoked a lot of skids to comment on it, because assembly is the pinnacle of knowledge according to the majority of skids and seeing such a name beheld by somebody they don't know is an insult and rises for instant gratification. This is an example of implicit flashcarding, a subset of the comments following through to the flashcards are indicative of the fact that he is trying to implicitly frustrate me, or ride my dick, both of which I acknowledge as skiddy behaviour, and because of this recognition he appears less compelled to start flashcarding outright.
+His flashcards stay at a bare minimum, profane while sarcastic, obviously intending to get somewhere with his light questions. (1) is the message that perfectly describes what he thinks of me, a baseless assumption made by the skid which he builds his thought and conceptions off. Nonetheless, the flashcarding is implicit because it is not so obviously with intent to gratify the ego of the asker.
+
+It is valuable to note that skid language often includes the words "LMFAO", "ROFLMFAO", "LOOOOOL", "LOL", and other variations of this.
