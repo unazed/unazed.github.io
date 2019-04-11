@@ -169,7 +169,7 @@ Ezio here humbly questions zakaria regarding the differences between typedefs an
 Both of these flashcarding attempts are categorized under explicit flashcarding, as the flashcard is obviously stated under an egotistic pretense, purely to benefit his ego and not to answer anything unknown.
 It's sad as fuck.
 
-<h2><b>Allan</b></h2>
+<h2><b>2.3 Allan</b></h2>
 
 From the 5 seconds I took to overview what I thought of Allan, the immediate adjective came to mind, pseudo-intellectual. He is a skid in late development with ability to recognize potentially skiddy behaviour, but too clear and obvious motives which can be dismissed by somebody with more experience (myself, viz. below).
 
