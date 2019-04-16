@@ -17,9 +17,9 @@ title: applied flashcarding theory for skids
 
 pt. 1: Flashcarding Theory
 1.0: Preface/introductory statement regarding the dissertation
-Definition 1.0.1: Implicit flashcarding
-Definition 1.0.2: Explicit flashcarding
-Definition 1.0.3: Superfluous flashcarding 
+Def. 1.0.1: Implicit flashcarding
+Def. 1.0.2: Explicit flashcarding
+Def. 1.0.3: Superfluous flashcarding 
 1.1: Motivation behind the dissertation
 
 pt. 2: Case Studies
@@ -30,11 +30,16 @@ pt. 2: Case Studies
 pt. 3: Post-theoretical Analysis
 3.0: Hierarchy of Flashcarding
 3.1: Trivial flashcards
-Definition 3.1.1: Trivial flashcard
+Def. 3.1.1: Trivial flashcard
 3.2: Atrivial flashcards 
-Definition 3.2.1: Atrivial flashcard
+Def. 3.2.1: Atrivial flashcard
 3.3: Bitrivial flashcards
-Definition 3.3.1: Bitrivial flashcard
+Def. 3.3.1: Bitrivial flashcard
+3.4: Quasi-bitrivial flashcards
+Def. 3.4.1: Buzzword
+Def. 3.4.2: Quasi-bitrivial flashcards
+Subdef. 3.4.2a: Quasi-trivial flashcard
+Subdef. 3.4.2b: Quasi-atrivial flashcard
 ```
 
 <h2><b>0.3 Foreword</b></h2>
@@ -45,7 +50,7 @@ join our discord here as well: https://discord.gg/VsPqCZG
 
 <3 - unazed
 
-<h1><b>pt. 1: Flashcarding theory</b></h1>
+<h1><b>pt. 1: Flashcarding Theory</b></h1>
 
 <h2><b>1.0 Preface</b></h2>
 
@@ -58,7 +63,9 @@ A natural branch from skid psychology is found within the actions perceived by t
 Superfluous flashcarding may fall under both implicit and explicit flashcarding, so we distinguish it as a separate form, since it is variable, and so it has a clear distinct property that we should recognize.
 
 <b><i>Definition 1.0.1:</i> Implicit flashcarding</b> is a categorization of flashcarding which is subtle and implied, it is (obviously) less obvious than explicit flashcarding and it is harder to construct, it is typically found portrayed higher up in the skid hierarchy.
+
 <b><i>Definition 1.0.2:</i> Explicit flashcarding</b> is a categorization of flashcarding which is much more frequently seen amongst all levels of skids, and it is easiest to construct, it is to the point and it is irrefutable.
+
 <b><i>Definition 1.0.3:</i> Superfluous flashcarding</b> is the final categorization of flashcarding which pertains to flashcards that are presumably not expected to have a response, because they are moreso intended as a poke at the person being flashcarded, since they convey authority.
 
 <h2><b>1.1 Motivation</b></h2>
@@ -258,5 +265,15 @@ An exemplification of atrivial flashcarding is not able to be found in any case 
 
 <b><i>Definition 3.3.1:</i> Bitrivial flashcards</b> are flashcards on topics which are specialized, but require a deep prerequisital knowledge to start to answer, these are the in-between classes of flashcards between trivial and atrivial, mostly because they are uniformly distributed across the skid hierarchy starting from fairly early at the bottom of the hierarchy, where intelligence starts to develop.
 For example, Zakaria's talk about trigraph sequences is an inwardly view into parsing and compilation, it is a specialization of an n-graph sequence which in order to understand and not just have heard of, i.e. understand the motivation and usage, you must have built some forefrontal knowledge of topics describing the procedures of parsing, tokenization, lexemization, et cetera. Although not necessarily restricted to just this particular topic, as it is applicable to linguistics as a whole, but in order to explain trigraph sequences you will require either an understanding of linguistics, or have learned enough theory behind C to be able to explain its usage.
+
+<h2><b>3.4 Quasi-bitrivial flashcards</b></h2>
+
+You may wonder what this apparently confusion conjugation of prefixes may mean, but considering if you've understood the definition of a bitrivial flashcard as one between a trivial flashcard and an atrivial flashcard, then:
+
+<b><i>Definition 3.4.1:</i> A buzzword</b> is a word which is a formality in a specific field, it is generally used in more formal explanations of concepts, or whenever attempting to be rigorous about an explanation. In the skid trade, however, the buzzword has a more negative denotation as a word used to confuse people whom are not familiar with a field up to its nomenclature, rather only concepts and simple wordings behind the concepts.
+
+<b><i>Definition 3.4.2:</i> Quasi-bitrivial flashcards</b> are a classification of bitrivial flashcards (or, disjointly, trivial/atrivial flashcards) whereby the flashcards are made out to be much easier or much harder to answer than they actually are, generally quasi-flashcards are intended as trick flashcards, since a quasi-trivial flashcard would be one that a person would find generally easy to answer with quite elementary knowledge, but is considered wrong due to some intricacy, or inaccuracy or incompatibility. Conversely, a quasi-atrivial flashcard is one that tends to be lengthy and buzzword-infested, but ends up having a trivial explanation. By rough example, you can understand the idea of a quasi-trivial flashcard by the canonical flashcard of "how big is a dword", which is generally impossible to get right within whatever allocated time-scope you are given, since a dword is a double-quantity of a word, and a word is the natural unit measurement of the CPU (the size which generally allows for atomic transfer operations between locations like registers and memory); and so, the issue with the flashcard is that it is ambiguous, generally all quasi-trivial flashcards are ambiguous, since word-sizes may differ across different instruction-set architectures. An example of a quasi-atrivial flashcard, would be the inverse of the prior quasi-trivial flashcard: "what is the bit-length of a double-word on an 8086 processor, running GNU/Linux+GrSec with no x87/x89 nor math coprocessors", which is reducible to "what is the bit-size of a dword in the x86-16 ISA", which'd consequently be 16 bits, hence a dword would be 32 bits.
+
+<h2><b>3.5 Semi-bitrivial flashcards</b></h2>
 
 TBD
