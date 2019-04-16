@@ -24,7 +24,11 @@ Definition 1.0.3: Superfluous flashcarding
 2.3: Allan
 3.0: Hierarchy of Flashcarding
 3.1: Trivial flashcards
+Definition 3.1.1: Trivial flashcard
 3.2: Atrivial flashcards 
+Definition 3.2.1: Atrivial flashcard
+3.3: Bitrivial flashcards
+Definition 3.3.1: Bitrivial flashcard
 ```
 
 <h2><b>0.3 Foreword</b></h2>
