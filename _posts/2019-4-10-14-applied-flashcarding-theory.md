@@ -15,7 +15,7 @@ title: applied flashcarding theory for skids
 0.2: Table of contents
 0.3: Foreword
 
-pt 1.: Flashcarding Theory
+pt. 1: Flashcarding Theory
 1.0: Preface/introductory statement regarding the dissertation
 Definition 1.0.1: Implicit flashcarding
 Definition 1.0.2: Explicit flashcarding
