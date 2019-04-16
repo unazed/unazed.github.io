@@ -38,13 +38,26 @@ Def. 3.3.1: Bitrivial flashcard
 3.4: Quasi-bitrivial flashcards
 Def. 3.4.1: Buzzword
 Def. 3.4.2: Quasi-bitrivial flashcards
-Subdef. 3.4.2a: Quasi-trivial flashcard
-Subdef. 3.4.2b: Quasi-atrivial flashcard
+  Corr. 3.4.2a: Quasi-trivial flashcard
+  Corr. 3.4.2b: Quasi-atrivial flashcard
+3.5: Semi-bitrivial flashcards
+Def. 3.5.1: Semi-bitrivial flashcards
+  Corr. 3.5.1a: Semi-trivial flashcard
+  Corr. 3.5.1b: Semi-atrivial flashcard
+3.6: Innocuous bitrivial flashcards
+Def. 3.6.1: Innocuous
+Def. 3.6.2: Innocuous bitrivial flashcards
+  Corr. 3.6.2a: Innocuous trivial flashcard
+  Corr. 3.6.2b: Innocuous atrivial flashcard
+3.7: Inable quasi-bitrivial flashcards
+Def. 3.7.1: Inable quasi-bitrivial flashcards
+  Corr. 3.7.1a: Inable quasi-trivial flashcard
+  Corr. 3.7.1b: Inable quasi-atrivial flashcard
 ```
 
 <h2><b>0.3 Foreword</b></h2>
 
-this dissertation namedrops a lotta skids so if you're angry bc i clowned tf out of you feel free to email me @ `unazed@protonmail.com` and we can clear up why i think you're retarded but you're not getting off this list LOL! feel free to also email any civil suits to the same email.
+this dissertation namedrops a few skids so if you're angry bc i clowned tf out of you feel free to email me @ `unazed@protonmail.com` and we can clear up why i think you're retarded but you're not getting off this list LOL! feel free to also email any civil suits to the same email.
 
 join our discord here as well: https://discord.gg/VsPqCZG
 
@@ -268,7 +281,7 @@ For example, Zakaria's talk about trigraph sequences is an inwardly view into pa
 
 <h2><b>3.4 Quasi-bitrivial flashcards</b></h2>
 
-You may wonder what this apparently confusion conjugation of prefixes may mean, but considering if you've understood the definition of a bitrivial flashcard as one between a trivial flashcard and an atrivial flashcard, then:
+You may wonder what this apparently confusing conjugation of prefixes means, but considering if you've understood the definition of a bitrivial flashcard as one between a trivial flashcard and an atrivial flashcard, then:
 
 <b><i>Definition 3.4.1:</i> A buzzword</b> is a word which is a formality in a specific field, it is generally used in more formal explanations of concepts, or whenever attempting to be rigorous about an explanation. In the skid trade, however, the buzzword has a more negative denotation as a word used to confuse people whom are not familiar with a field up to its nomenclature, rather only concepts and simple wordings behind the concepts.
 
@@ -276,4 +289,18 @@ You may wonder what this apparently confusion conjugation of prefixes may mean, 
 
 <h2><b>3.5 Semi-bitrivial flashcards</b></h2>
 
-TBD
+The prefix `semi-`, with respect to the context, is intended to refer to the correctness and precision of the flashcard's contents itself, and by that:
+
+<b><i>Definition 3.5.1:</i> A semi-bitrivial flashcard</b> is a flashcard whose precise nature is imprecise, causing inherent complication in the mind of the flashcardee and therefore prolonging the thought period and ego of the flashcarder. A flashcard that makes no sense is not really a flashcard, by category, it is a superfluous flashcard, which is still a flashcard but it is glossed over and irrelevant--so we can only have a classification for semi-bitrivial flashcards. For example, the example given for the quasi-trivial flashcard in the prior section is an example of a semi-atrivial flashcard, it is not correct etiquette to attempt to derive one's capacity in a field by asking ambiguous questions and thereby being ignorant to the response asking for clarification as a method of prolonging their time.
+
+<h2><b>3.6 Innocuous bitrivial flashcards</b></h2>
+
+<b><i>Definition 3.6.1:</i> Innocuous</b> refers to the property of being ineffective, harmless and with incapacity of invoking anything. In the skid trade, innocuity and harmlessness are synonymous, where harmless is generally used to describe a person whom is trying to inflict frustration and authority, but is unable to do anything physically, or affect the virtual presence (usually) of the skids flashcarding.
+
+<b><i>Definition 3.6.2:</i> Innocuous bitrivial flashcards</b> are therefore flashcards that cannot affect one's authority, because they are deemed as hopeless attempts of gratification to the flashcarder wherein they have most likely been surprised by the fact that the flashcardee has answered their questions succinctly (probably due to a mistake of them failing to be a skid and making flashcards that are answerable unambiguously) and so are simply making flashcards that hold no fruit, because they are last resorts.
+
+<h2><b>3.7 Inable quasi-bitrivial flashcards</b></h2>
+
+<b><i>Definition 3.7:</i> An inable quasi-bitrivial flashcard</b> is a flashcard that the asking-skid(s) themselves cannot answer (precisely), and are asked in order to lowerthe morals of the flashcardee, in hopes of attaining a reaction. Generally, this classification of flashcard follows a frequency function of a horizontally stretched upside-down `U` curve on a Cartesian plane, where the further down the x-axis the less skiddy the flashcardee becomes. Similar to innocuous bitrivial flashcards, inable quasi-bitrivial flashcards are generally asked as last resorts or used to prolong the time alwhilst the skid(s) think of more flashcards, or more ways to assert authority.
+
+Thanks for reading.
