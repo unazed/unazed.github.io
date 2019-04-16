@@ -14,14 +14,20 @@ title: applied flashcarding theory for skids
 0.1: Abstract
 0.2: Table of contents
 0.3: Foreword
+
+pt 1.: Flashcarding Theory
 1.0: Preface/introductory statement regarding the dissertation
 Definition 1.0.1: Implicit flashcarding
 Definition 1.0.2: Explicit flashcarding
 Definition 1.0.3: Superfluous flashcarding 
 1.1: Motivation behind the dissertation
+
+pt. 2: Case Studies
 2.1: Luminous
 2.2: Zakaria
 2.3: Allan
+
+pt. 3: Post-theoretical Analysis
 3.0: Hierarchy of Flashcarding
 3.1: Trivial flashcards
 Definition 3.1.1: Trivial flashcard
