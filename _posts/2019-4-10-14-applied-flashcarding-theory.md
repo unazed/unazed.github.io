@@ -3,25 +3,31 @@ layout: post
 title: applied flashcarding theory for skids
 ---
 
-<h2><b>0.1 abstract</b></h2>
+<h2><b>0.1 Abstract</b></h2>
 <i>A dissertation regarding the topic of 'flashcarding', which, contextually is concerning the act that a skid (ref. 'fundamental theorem of skid psychology' for definition of a skid) could majorly perform in order to sustain their egotistic personality.</i>
 
 <b>keywords: flashcarding, skid, egotistic</b>
 
 
-<h2><b>0.2 contents</b></h2>
+<h2><b>0.2 Contents</b></h2>
 ```
-0.1: abstract
-0.2: table of contents
-0.3: foreword
-1.0: preface/introductory statement regarding the dissertation
-1.1: motivation behind the dissertation
+0.1: Abstract
+0.2: Table of contents
+0.3: Foreword
+1.0: Preface/introductory statement regarding the dissertation
+Definition 1.0.1: Implicit flashcarding
+Definition 1.0.2: Explicit flashcarding
+Definition 1.0.3: Superfluous flashcarding 
+1.1: Motivation behind the dissertation
 2.1: Luminous
 2.2: Zakaria
 2.3: Allan
+3.0: Hierarchy of Flashcarding
+3.1: Trivial flashcards
+3.2: Atrivial flashcards 
 ```
 
-<h2><b>0.3 foreword</b></h2>
+<h2><b>0.3 Foreword</b></h2>
 
 this dissertation namedrops a lotta skids so if you're angry bc i clowned tf out of you feel free to email me @ `unazed@protonmail.com` and we can clear up why i think you're retarded but you're not getting off this list LOL! feel free to also email any civil suits to the same email.
 
@@ -31,7 +37,7 @@ join our discord here as well: https://discord.gg/VsPqCZG
 
 <h1><b>pt. 1: Flashcarding theory</b></h1>
 
-<h2><b>1.0 preface</b></h2>
+<h2><b>1.0 Preface</b></h2>
 
 A natural branch from skid psychology is found within the actions perceived by the skid, that is, (more frequently) found within the action of "flashcarding"; this action is one that benefits the skid by approving their ego, and being able to both gauge the skill-level of the person with whom they are frustrated with. It is a heavily mutable mechanism, and so because of this, it has infinite variance. In this dissertation we will describe these types of flashcarding:
 
@@ -41,7 +47,11 @@ A natural branch from skid psychology is found within the actions perceived by t
 
 Superfluous flashcarding may fall under both implicit and explicit flashcarding, so we distinguish it as a separate form, since it is variable, and so it has a clear distinct property that we should recognize.
 
-<h2><b>1.1 motivation</b></h2>
+<b><i>Definition 1.0.1:</i> Implicit flashcarding</b> is a categorization of flashcarding which is subtle and implied, it is (obviously) less obvious than explicit flashcarding and it is harder to construct, it is typically found portrayed higher up in the skid hierarchy.
+<b><i>Definition 1.0.2:</i> Explicit flashcarding</b> is a categorization of flashcarding which is much more frequently seen amongst all levels of skids, and it is easiest to construct, it is to the point and it is irrefutable.
+<b><i>Definition 1.0.3:</i> Superfluous flashcarding</b> is the final categorization of flashcarding which pertains to flashcards that are presumably not expected to have a response, because they are moreso intended as a poke at the person being flashcarded, since they convey authority.
+
+<h2><b>1.1 Motivation</b></h2>
 
 You may wonder, what is the motivation behind wasting so much time writing about theory behind "flashcarding"? Such a specialized field of study, if even of study, and not just of interest, must have so little content to it? To these questions I must explain that flashcarding is the epitome of egotism, it is the declaration by the skid to the person of interest that the skid is frustrated, their ego is challenged, and they want to prove it to themselves with relativity to their own knowledge, that they are better and the person of interest is not.
 And so, why is it not so obviously interesting to delve into pure concentrated egotism? It is the theory of egotism.
@@ -203,4 +213,40 @@ From the 5 seconds I took to overview what I thought of Allan, the immediate adj
 It seems that my setting of my name to a pseudo-x86/ARM instruction has invoked a lot of skids to comment on it, because assembly is the pinnacle of knowledge according to the majority of skids and seeing such a name beheld by somebody they don't know is an insult and rises for instant gratification. This is an example of implicit flashcarding, a subset of the comments following through to the flashcards are indicative of the fact that he is trying to implicitly frustrate me, or ride my dick, both of which I acknowledge as skiddy behaviour, and because of this recognition he appears less compelled to start flashcarding outright.
 His flashcards stay at a bare minimum, profane while sarcastic, obviously intending to get somewhere with his light questions. (1) is the message that perfectly describes what he thinks of me, a baseless assumption made by the skid which he builds his thought and conceptions off. Nonetheless, the flashcarding is implicit because it is not so obviously with intent to gratify the ego of the asker.
 
-It is valuable to note that skid language often includes the words "LMFAO", "ROFLMFAO", "LOOOOOL", "LOL", and other variations of this.
+It is valuable to note that skid language often includes the words "LMFAO", "ROFLMFAO", "LOOOOOL", "LOL", and other variations of these words.
+
+<h1><b>pt. 2: Post-theoretical Analysis</b></h1>
+
+<h2><b>3.0 Hierarchy of Flashcarding</b></h2>
+
+As is for skid psychology, the representation of skids at different levels with due respect to their development in their skid career, so exists the hierarchy of levels of flashcarding. I shall talk about the following forms of flashcards in detail:
+
+- Trivial flashcards
+- Atrivial flashcards
+- Bitrivial flashcards
+- Quasi-bitrivial flashcards
+- Semi-bitrivial flashcards
+- Innocuous bitrivial flashcards
+- Inable quasi-bitrivial flashcards
+
+You may think I'm just implicitly flashcarding you on your knowledge of English prefixes and word definitions, but fear not, for you can Google and that there is no time limit on reading this.
+
+<h2><b>3.1 Trivial flashcards</b></h2>
+
+<b><i>Definition 3.1.1:</i> Trivial flashcards</b> are flashcards that can come in the three forms described priorly, i.e.: implicit, explicit and superfluous, generally, however, trivial flashcards are superfluous whenever you are talking to someone that you are familiar with, since it is assumed that you both have somewhat arbitrary gauges of each others' abilities, hence trivial flashcards should only arise implicitly/explicitly as course of seriously frustrating the skid.
+In essence, trivial flashcards are flashcards that take no genius understanding of a field to understand and be able to answer, questions with very slight relation to the topic tself that can be formulated as the result of a glimpse over the introductory pages of an introductory book into the field. Generally, the higher up the skid hierarchy that you go you will find higher usage of this method of flashcarding, because it is a harmless way to poke at each other.
+In the three case studies above, an example of trivial flashcarding can be found with Zakaria, his questioning of finding an equation that satisfies `calloc` is a flashcard that has little relation to the memory allocation system itself besides being a question testing whether you understand the intrinsic differences between the `malloc` utility and why one would use `calloc` over it, that is, because it is more compatible with sequential data structures, and it automatically zeroes out the chunk in the heap. This is taught when you first learn the usage of the `calloc` utility because a beginner would wonder, "why use this over `malloc`?" to which is answered the same way as you would answer the flashcard. It is trivial.
+
+Any skid can formulate trivial flashcards. It is an easy and shameless way of testing whether one is simply competent, or just posed as a way to annoy one another.
+
+<h2><b>3.2 Atrivial flashcards</b></h2>
+
+<b><i>Definition 3.2.1:</i> An atrivial flashcard</b> is the opposite of a trivial flashcard, it is non-trivial (the `a-` prefix is fancier), it is a flashcard posed more frequently the succesively further up you climb in the skid hierarchy, it is a general term for a flashcard that requires specialized knowledge in the field itself opposed to a componenet of the field (as exemplified before, by Zakaria, ref. Trivial Flashcarding), for example, an atrivial flashcard may concern a question pertaining to the underpinnings of a certain theorem under a subfield such as calculus [mathematics], but a subsequent trivial flashcard would concern explaining the certain notations used in the theorem, a simple component which requires otherwardly knowledge of mathematics. Lower class skids may still formulate atrivial flashcards, which they are unable to understand themselves, ref. inable quasi-bitrivial flashcards.
+An exemplification of atrivial flashcarding is not able to be found in any case studies (at the moment of writing, although more may be added), however I can generate the context to some examples: suppose a higher-tier skid was flashcarding on the field of graph theory, then an example atrivial flashcard would ask the flashcardee "minimally, how many edges would you need to add (allowing expansions) that if you took the complete graph with order the same as the order of the maximal clique under the tetrahedron, that you would end with a nonplanar graph".
+
+<h2><b>3.3 Bitrivial flashcards</b></h2>
+
+<b><i>Definition 3.3.1:</i> Bitrivial flashcards</b> are flashcards on topics which are specialized, but require a deep prerequisital knowledge to start to answer, these are the in-between classes of flashcards between trivial and atrivial, mostly because they are uniformly distributed across the skid hierarchy starting from fairly early at the bottom of the hierarchy, where intelligence starts to develop.
+For example, Zakaria's talk about trigraph sequences is an inwardly view into parsing and compilation, it is a specialization of an n-graph sequence which in order to understand and not just have heard of, i.e. understand the motivation and usage, you must have built some forefrontal knowledge of topics describing the procedures of parsing, tokenization, lexemization, et cetera. Although not necessarily restricted to just this particular topic, as it is applicable to linguistics as a whole, but in order to explain trigraph sequences you will require either an understanding of linguistics, or have learned enough theory behind C to be able to explain its usage.
+
+TBD
