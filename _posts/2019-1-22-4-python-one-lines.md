@@ -1,6 +1,6 @@
 ---
 layout: post
-title: python one liners (without semicolons)
+title: python one liners (no semicolons)
 ---
 
 Python, as you should know, is a versatile and flexible language, for this it suffers the well-debated repercussion of speed and performance. What goes on in this post is the complete inverse of performance-gaining, and should not be done at any point in your development, unless it is skid-quality code where you aren't expected to reach a certain bar of quality, then, by all means, go for it.
