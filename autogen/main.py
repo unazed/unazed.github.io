@@ -6,6 +6,8 @@ import argparse
 import json
 import os
 
+from pprint import pprint
+
 
 FOLDER_TEMPLATE_FOLDER = "_template"
 
@@ -185,13 +187,17 @@ class FolderTree:
 
 
 def extract_template_positions(path: str) \
-        -> dict[Literal["imports"] | Literal["exports"], list[TemplatePosition]]:
+        -> dict[Literal["imports"] | Literal["exports"], list[TemplateDecl]]:
     mapping = {"imports": [], "exports": []}
+    templ_spec = TemplateSpec()
     ctx = TemplateParsingCtx(file=open(path), path=path)
     while (cs := ctx.peek(n=2)):
         if cs == "{{":
             decl = ctx.expect_decl()
-            print(f"Got decl {decl=}")
+            if decl.qualifier == "import":
+                mapping["imports"].append(decl)
+            elif decl.qualifier == "export":
+                mapping["exports"].append(decl)
         ctx.read()
     return mapping
 
@@ -203,7 +209,7 @@ def parse_template_spec(path: str) -> TemplateSpec:
         if not os.path.isfile(file):
             continue
         for type_, positions in extract_template_positions(file).items():
-            getattr(templ, type_)[file] = positions
+            getattr(templ, type_)[os.path.basename(file)] = positions
     return templ
 
 
@@ -213,6 +219,7 @@ def preprocess_folder_tree(root_directory: str, folder_tree: FolderTree) -> Fold
         folder_tree.template = parse_template_spec(templ_path)
     for child in folder_tree:
         preprocess_folder_tree(abs_path, child)
+    return folder_tree
 
 
 def derive_hierarchy(folder: str) -> FolderTree:
@@ -230,6 +237,7 @@ def derive_hierarchy(folder: str) -> FolderTree:
 def main(root_directory: str, out_directory: str) -> None:
     hierarchy = preprocess_folder_tree(
             root_directory, derive_hierarchy(root_directory))
+    pprint(hierarchy)
 
 
 if __name__ == "__main__":
