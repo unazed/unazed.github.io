@@ -1,0 +1,47 @@
+Consider:
+
+src/
+	_template/
+		index.html
+		style.css
+	_config.json
+	posts/
+		_template/
+			index.html
+			style.css
+		_config.json
+		"About myself"/
+			...
+
+The navigable folder hierarchy would simply be:
+
+/
+	posts/
+		About myself/
+
+The `_template` folder outlines the default content that navigating to the respective folder would display.
+The syntax {{ import foo }} indicates that an {{ export foo }} must exist later in the preprocessing stage,
+wherein they will be substituted. Alternative syntax {{ import foo else }} exists to allow alternative
+content in the case that the import is not found.
+
+## src/_template/index.html:
+<html>
+	<head> ... </head>
+	<body>
+		<div id="content">
+			{{ import content_name else }}
+			No content :(
+			{{ end }}
+		</div>
+	</body>
+</html>
+
+## src/posts/_template/index.html
+{{ export content_name }}
+	Hello, world!
+{{ end }}
+
+Then how would `/posts/About myself/` be rendered? Firstly templating rules for `/_template/index.html` will
+be considered, following by `/posts/_template/index.html`, and so forth proceeding downwards in the hierarchy.
+Essentially cascading downwards. This isn't particularly powerful for broader applications, but enables
+reducing cascading website structures such as blogs.
