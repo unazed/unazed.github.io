@@ -3,7 +3,7 @@
 {% block content %}
   {% if posts %}
     {% for post in posts %}
-      <p>{{ loop.index0 }}. <a href="{{ post.filename }}">&gt; {{ post.title }}</a></p>
+      <p>{{ loop.index0 }}. <a href="{{ post.filename }}">{{ post.title }}</a></p>
     {% endfor %}
   {% else %}
     <p>No posts yet.</p>
