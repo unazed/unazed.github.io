@@ -2,6 +2,7 @@ from jinja2 import Environment, FileSystemLoader
 import markdown
 
 import glob, os
+import hashlib
 
 
 STATIC_DIR = "static/"
@@ -31,13 +32,14 @@ def main() -> None:
   for post in glob.glob(os.path.join(POSTS_DIR, "*.md")):
     with open(post) as fd_post:
       post_content = fd_post.read()
+    title = hashlib.md5(post.encode())
     output = template.render(
       **{
         "title": metadata.get("title", "Unnamed"),
         "content": md.convert(post_content)
       }
     )
-    with open(os.path.join(OUTPUT_DIR, post), "w") as fd_post:
+    with open(os.path.join(OUTPUT_DIR, "posts", title.hexdigest()), "w") as fd_post:
       fd_post.write(output)
     
 
