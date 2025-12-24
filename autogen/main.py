@@ -27,7 +27,12 @@ def main() -> None:
       for key, value in md.Meta.items()
     }
 
-  # Render the posts first
+  # Render the index page
+  output = env.get_template("index.html.j2").render()
+  with open(os.path.join(OUTPUT_DIR, "index.html"), "w") as fd_index:
+    fd_index.write(output)
+
+  # Render the posts
   os.mkdir(os.path.join(OUTPUT_DIR, "posts"))
   for post in glob.glob(os.path.join(POSTS_DIR, "*.md")):
     with open(post) as fd_post:
