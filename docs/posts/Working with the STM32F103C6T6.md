@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/pygments.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Unnamed</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+    </header>
+    <main>
+      
+  <h2>Motivation</h2>
+<p>Getting into embedded systems has always seemed a daunting task for myself, even after so many years of relatively low-level development and reverse engineering on Intel x86/x64 platforms. I decided to start with purchasing four STM32 microcomputer units (MCU) for a fairly inexpensive price, just under the assumption that I may break something more than once.</p>
+<p>I've had very little experience working with ARM-based systems, so to begin my task of constructing, debugging, and extending an elementary firmware (whose functionality I haven't even really ascertained yet,) it feels as a shot in the deep dark to undertake this exercise. Nonetheless, like many other untethered ambitions I've pursued, I will try my best to achieve something of value, especially as this project exposes the veil between electronics and system development that I have wanted to pierce early into my hobbyist career.</p>
+<h2>Why this particular MCU?</h2>
+<p>Initially: no reason.</p>
+<p>The STM32F10x series start from low-power cost-effective, and range up to devices which support more components and bandwidth in terms of flash and memory. In the case of my MCU, the difference between the STM32F103Cxxx variants appears to be increasing flash/memory capacity.
+Even the lowest end MCU in this family would be fine. To the benefit of, and for the purpose of learning, an increasingly constrained environment is ideal for learning how to optimise and manage resources.</p>
+<h2>Where do I even start?</h2>
+<p>Aside from purchasing the relevant goodies (an ST-Link to interface with the MCU,) the first step was understanding what I would even need to begin actualising my code from thought into fruition. Usually, I'd download the native GCC toolchain (with MSYS32 on Windows), install a text editor, create my folder structure, a <code>main</code> file outputting "Hello, world!" to the user, a <code>Makefile</code> to organise the compilation, and be happy.
+Unfortunately, and as one would expect, only one of these steps is adjacent to the embedded-equivalent--that being which you may still install any text editor of your choosing.</p>
+<p>My conception of the workflow was initially:</p>
+<ol>
+<li>Develop your primary source files</li>
+<li>Cross-compile the sources for ARM (Cortex-M3 in the case of STM32F1xx)</li>
+<li>Link it against a linker-file which places it appropriately according to the MCU's memory mapping</li>
+<li>Flash it using whichever tools the ST-Link provides</li>
+<li>If necessary, debug it with the ST-Link--or preferably the toolchain's GDB via remote connection</li>
+</ol>
+<p>So far, it seems to be fairly accurate disregarding some pedantic details. Cross-compilation is performed through <code>arm-none-eabi-gcc</code>, whose architecture is specified by the <code>CFLAGS</code> as <code>-mcpu=cortex-m3</code>. The linking stage can be utterly simplified to simply indicating where the flash and memory sections are located and their lengths, and then subsequently placing the typical <code>.text</code>, <code>.data</code> and <code>.bss</code> sections, with the special addition of placing an interrupt service routine table (ISR) at the root of the flash storage, and also indicating where the <code>.stack</code> starts.</p>
+<div class="codehilite"><pre><span></span><code><span class="sx">ENTRY(vector_table)</span>
+
+<span class="sx">MEMORY</span>
+<span class="sx">{</span>
+<span class="w">  </span><span class="sx">FLASH</span><span class="w"> </span><span class="nl">(rx)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="sx">ORIGIN</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="sx">0x08000000,</span><span class="w"> </span><span class="sx">LENGTH</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="sx">32K</span>
+<span class="w">  </span><span class="sx">RAM</span><span class="w">   </span><span class="nl">(rwx)</span><span class="p">:</span><span class="w"> </span><span class="sx">ORIGIN</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="sx">0x20000000,</span><span class="w"> </span><span class="sx">LENGTH</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="sx">10K</span>
+<span class="sx">}</span>
+
+<span class="sx">SECTIONS</span>
+<span class="sx">{</span>
+<span class="w">  </span><span class="nl">.isr_vector</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="sx">{</span>
+<span class="w">    </span><span class="sx">KEEP(*(.isr_vector))</span>
+<span class="w">  </span><span class="sx">}</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">FLASH</span>
+
+<span class="w">  </span><span class="nl">.text</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="sx">{</span>
+<span class="w">    </span><span class="sx">*(.text*)</span>
+<span class="w">    </span><span class="sx">*(.rodata*)</span>
+<span class="w">  </span><span class="sx">}</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">FLASH</span>
+
+<span class="w">  </span><span class="nl">.data</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="sx">{</span>
+<span class="w">    </span><span class="sx">*(.data*)</span>
+<span class="w">  </span><span class="sx">}</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">RAM</span><span class="w"> </span><span class="sx">AT</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">FLASH</span>
+
+<span class="w">  </span><span class="nl">.bss</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="sx">{</span>
+<span class="w">    </span><span class="sx">*(.bss*)</span>
+<span class="w">    </span><span class="sx">*(COMMON)</span>
+<span class="w">  </span><span class="sx">}</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">RAM</span>
+
+<span class="w">  </span><span class="kr">.stack</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nl">{</span>
+<span class="w">    </span><span class="sx">*(.stack)</span>
+<span class="w">  </span><span class="sx">}</span><span class="w"> </span><span class="sx">&gt;</span><span class="w"> </span><span class="sx">RAM</span>
+<span class="sx">}</span>
+</code></pre></div>
+
+<h2>Interim note regarding resources</h2>
+<ul>
+<li>The reference manual: <a href="https://www.st.com/resource/en/reference_manual/rm0008-stm32f101xx-stm32f102xx-stm32f103xx-stm32f105xx-and-stm32f107xx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf">RM0008</a>. Priceless in understanding essentially everything about the operation and layout of the MCU.</li>
+<li>The programming manual: <a href="https://www.st.com/resource/en/programming_manual/pm0056-stm32f10xxx20xxx21xxxl1xxxx-cortexm3-programming-manual-stmicroelectronics.pdf">PM0056</a>. Extensive information on the instruction set, essentially just the ARM Cortex-M3 programming manual, but likely with relevant considerations for the specific MCU.</li>
+<li>The application notes: <a href="https://www.st.com/resource/en/application_note/an2606-introduction-to-system-memory-boot-mode-on-stm32-mcus-stmicroelectronics.pdf">AN2606</a>. Relevant to understanding how to configure your MCU to select between the (typically?) pre-installed bootloader stored in read-only memory, and yours stored at <code>0x0800_000</code>. My MCU notably came with a shunt across both <code>BOOT0</code> and <code>BOOT1</code> pins to <code>GND</code>, which means that it will begin executing from the flash root by default, this may be different from other suppliers.</li>
+<li>The <a href="https://web.eecs.umich.edu/~prabal/teaching/resources/eecs373/ARM-AAPCS-EABI-v2.08.pdf">AAPCS</a>: supplementary documentation and reading to further understand how the ARM architecture expects things to be done. Elaborates on calling conventions, broader code/data alignment constraints, etc.</li>
+<li>The <a href="https://www.alldatasheet.com/datasheet-pdf/download/201595/STMICROELECTRONICS/STM32F103C6T6.html">preliminary datasheet</a>: semi-important to understand what operating conditions your MCU will work under, and its lifespan. Section (5.3.9) (Table 24) indicates the minimum endurance cycles before flash memory faults may occur, though given at extremal conditions.</li>
+</ul>
+<h2>What does anything in that linker script mean?</h2>
+<p>I've never actually gone out of my way to learn linker-script, since I've only ever had to read it, and it's fairly self-explanatory when read, but seems to get endlessly complex as constraints grow. I had a few questions when reading the file:</p>
+<ol>
+<li>Does the <code>&gt;</code> in the <code>&lt;section&gt; : { ... } &gt; &lt;region&gt;</code> grammar mean to append that section ahead of any previous sections? Are there any implicit alignment constraints? If no to the former question, can the linker reorder sections as it sees fit?</li>
+<li>Is the <code>&lt;section&gt;</code> token just the identifier for the group of sections expounded immediately after, could I just do <code>.blah-blah { *(.text*) } &gt; FLASH</code>, and have it be equivalent?</li>
+<li>Why is <code>.isr_vector</code> notated with <code>KEEP</code>, but <code>.stack</code> isn't?</li>
+<li>What is <code>COMMON</code>? Is this a linker-defined constant for compiler-specific sections that might exist, like for DWARF or such?</li>
+<li>What does <code>.data { ... } &gt; RAM AT &gt; FLASH</code> mean? Are we copying the data section between both RAM and flash? If so, why?</li>
+<li>Does the <code>ENTRY(vector_table)</code> really matter--won't the MCU begin executing at <code>0x0800_0000</code> regardless?</li>
+</ol>
+<p>And then, subsequent research to answer these questions:</p>
+<ol>
+<li>It's apparently not technically <em>appending</em>, but more-so just indicating which section belongs to which memory-region, although the linker will respect the precedence of sections as they appear in the script. Implicit alignments are known by the cross-compiler, as they are typically set out by the AAPCS, however specific alignments for DMA will likely have to be explicitly annotated.</li>
+<li>I had a crucial misunderstanding of the syntax's purpose. The first <code>.text</code> indicates the resultant section from which all object files will collate their sections into, if they happen to have sections that match the proceeding <code>.text*</code> wildcard. The first asterisk in <code>*(.text*)</code> simply means to consider <em>all</em> object files, whereas <code>test.o(.text)</code> would only look at <code>test.o</code>.
+   Furthermore, wildcards on these filenames are not supported as they are with section names.</li>
+<li>In the current context, we need to <code>KEEP</code> <code>.isr_vector</code> because, although it may have no references at link-time (it is typically just referred to by hardware when an interrupt occurs), we do not want it to be pruned or altered in any way whatsoever, as it would simply cause undefined behaviour.
+   <code>.stack</code> is a more peculiar case, since it doesn't necessarily need to be defined as a section, as it simply refers to an address in RAM, and it is made known to the processor by virtue of being the first entry in the ISR, and thus given that the address is properly aligned, all further operations on <code>sp</code> will perform as expected.
+   However, I feel as though the <code>_estack</code> (and <code>_sstack</code>) symbols are missing, which would simply help make the definition globally available to the program, instead of requiring a header-definition.</li>
+<li><code>COMMON</code> is apparently a relic of practice long-gone. In essence, it seems to just be a <code>.bss</code> per-file equivalent, which is then collected into the resultant <code>.bss</code> section. It seems to just exist for the sole purpose of enabling legacy behaviour, where variable definitions lacking <code>extern</code> can still be resolved to an external symbol, as they're resolved through looking at each object file's <code>COMMON</code> sections (?)</li>
+<li>This syntax is abhorrently confusing at first, but it essentially just means <code>VMA &lt;-loaded- LMA</code>, where VMA and LMA mean virtual/loaded memory address.
+   This mindset felt a little tricky for me to get out of, but remember when you flash your program, it is permanent, and flash memory will retain it indefinitely, but RAM will not. <em>However</em>, because flash is expensive to read from/write to, you should act as if it's read-only (further togglable by R/W protections on the chip,) and so, what if you have global variables that you want to always keep, but also have the capability to change? You need to store their static initialised value in flash (the LMA), and then copy it to RAM (the VMA) each time you reset the MCU.
+   So, the statement is telling the linker that the variable will be initialised (if it has a value) in flash, and then will be copied by the entry routine (or at least any time before it's accessed) to RAM, and so any time a translation unit refers to the variable, ensure the VMA is used.</li>
+<li><code>ENTRY</code> doesn't appear to have any consequence on how the resultant binary is generated by the <code>objcopy</code>, as the "loading" stage is handled by the MCU, and it may be omitted.</li>
+</ol>
+<p>Furthermore, the permissions indicated on memory regions seem to just be cosmetic, although they may prevent certain (obscure?) link-time issues, and obviously increase semantic clarity to the reader.</p>
+<h2>Why do we even load at 0x0800_0000?</h2>
+<p>I found it a little disorienting trying to understand the STM32 memory map and boot configuration, solely because it states two different things across two different manuals, namely from the PM0056:</p>
+<div class="codehilite"><pre><span></span><code><span class="nx">On</span><span class="w"> </span><span class="nx">system</span><span class="w"> </span><span class="nx">reset</span><span class="p">,</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">vector</span><span class="w"> </span><span class="nx">table</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="nx">fixed</span><span class="w"> </span><span class="nx">at</span><span class="w"> </span><span class="nx">address</span><span class="w"> </span><span class="mh">0x0000</span><span class="w"> </span><span class="mi">0000</span><span class="p">.</span>
+<span class="nx">Privileged</span><span class="w"> </span><span class="nx">software</span><span class="w"> </span><span class="nx">can</span><span class="w"> </span><span class="nx">write</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">VTOR</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">relocate</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">vector</span><span class="w"> </span><span class="nx">table</span><span class="w"> </span><span class="nx">start</span><span class="w"> </span>
+<span class="nx">address</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="nx">different</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">location</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">range</span><span class="w"> </span><span class="mh">0x0000</span><span class="w"> </span><span class="mi">0080</span><span class="w"> </span><span class="nx">to</span><span class="w"> </span><span class="mh">0x3FFF</span><span class="w"> </span><span class="nx">FF80</span>
+</code></pre></div>
+
+<p>And then the RM0008 further states:</p>
+<div class="codehilite"><pre><span></span><code><span class="p">[</span><span class="o">...</span><span class="p">]</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">main</span><span class="w"> </span><span class="nx">Flash</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="nx">aliased</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">boot</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">space</span><span class="w"> </span><span class="p">(</span><span class="mh">0x0000</span><span class="w"> </span><span class="mi">0000</span><span class="p">),</span><span class="w"> </span>
+<span class="nx">but</span><span class="w"> </span><span class="nx">still</span><span class="w"> </span><span class="nx">accessible</span><span class="w"> </span><span class="nx">from</span><span class="w"> </span><span class="nx">its</span><span class="w"> </span><span class="nx">original</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">space</span><span class="w"> </span><span class="p">(</span><span class="mh">0x800</span><span class="w"> </span><span class="mi">0000</span><span class="p">).</span><span class="w"> </span><span class="nx">In</span><span class="w"> </span><span class="nx">other</span><span class="w"> </span>
+<span class="nx">words</span><span class="p">,</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">Flash</span><span class="w"> </span><span class="nx">memory</span><span class="w"> </span><span class="nx">contents</span><span class="w"> </span><span class="nx">can</span><span class="w"> </span><span class="nx">be</span><span class="w"> </span><span class="nx">accessed</span><span class="w"> </span><span class="nx">starting</span><span class="w"> </span><span class="nx">from</span><span class="w"> </span><span class="nx">address</span>
+<span class="mh">0x0000</span><span class="w"> </span><span class="mi">0000</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="mh">0x800</span><span class="w"> </span><span class="mi">0000</span>
+</code></pre></div>
+
+<p>This was confusing to begin with, and seemed like unneeded complexity, but the reason appears to stem from the fact that the MCU specifically has multiple boot modes, whose bootloaders must reside in different areas of memory (either SRAM or flash;) and so, the processor needs a way to alias two different memory addresses to a single one.
+Once the processor loads the reset handler at <code>0x0000 0004</code>, aliased to either <code>0x2000 0004</code> or <code>0x0800 0004</code> the handler will then continue to work in their respective memory regions.</p>
+<h2>Okay, how do we prepare the processor in our code?</h2>
+<p>The linker does a lot of the simpler grunt-work of ensuring static data will be where it needs to be in flash in order to be processed by the MCU, we just need to ensure that we follow up on our promises which we made to the linker; i.e., zero-initialising the <code>.bss</code> section, and copying over the <code>.data</code> section into SRAM.
+We must do this in the reset handler, since this is essentially the equivalent of Linux's <code>_start</code>, where we have nothing but a blank-slate of a CRT yet to initialise:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint-gcc.h&gt;</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">_sdata</span><span class="p">,</span><span class="w"> </span><span class="n">_edata</span><span class="p">,</span><span class="w"> </span><span class="n">_sidata</span><span class="p">;</span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">_szero</span><span class="p">,</span><span class="w"> </span><span class="n">_ezero</span><span class="p">;</span>
+<span class="k">extern</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">_estack</span><span class="p">;</span>
+
+<span class="n">__attribute__</span><span class="p">((</span><span class="k">noreturn</span><span class="p">))</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">isr_reset_handler</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+
+<span class="kt">_Bool</span><span class="w"> </span><span class="n">isr_reset_completed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">__attribute__</span><span class="p">((</span><span class="w"> </span><span class="n">section</span><span class="p">(</span><span class="s">&quot;.isr_vector&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">))</span>
+<span class="k">const</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">isr_vector</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="o">&amp;</span><span class="n">_estack</span><span class="p">,</span>
+<span class="n">�</span><span class="w">� </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">isr_reset_handler</span>
+<span class="p">};</span>
+
+<span class="kt">void</span>
+<span class="nf">isr_reset_handler</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">�</span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">isr_reset_completed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Note that the linker script was mildly revised to more verbosely comply with alignments, and to export section demarcation symbols. Further note the <code>_sidata</code> symbol which confused me initially when I was wondering if the <code>_sdata</code>/<code>_edata</code> symbols for the section we want to relocate to SRAM referred to the VMA or LMA addresses. They refer to the former, and so one needs to add an additional <code>_sidata = LOADADDR(.data);</code> in order to grab the LMA.</p>
+<p>I added the <code>isr_reset_completed</code> global to verify that the <code>.data</code> section was appropriately relocated, to which GDB proved me wrong:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">isr_reset_handler</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">src</span><span class="o">/</span><span class="n">handler</span><span class="p">.</span><span class="n">c</span><span class="o">:</span><span class="mi">17</span>
+<span class="mi">17</span><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">c</span>
+<span class="n">Continuing</span><span class="p">.</span>
+<span class="n">Program</span><span class="w"> </span><span class="n">received</span><span class="w"> </span><span class="n">signal</span><span class="w"> </span><span class="n">SIGINT</span><span class="p">,</span><span class="w"> </span><span class="n">Interrupt</span><span class="p">.</span>
+<span class="n">isr_reset_handler</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">src</span><span class="o">/</span><span class="n">handler</span><span class="p">.</span><span class="n">c</span><span class="o">:</span><span class="mi">25</span>
+<span class="mi">25</span><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">printf</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">isr_reset_completed</span>
+<span class="mi">1</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">printf</span><span class="w"> </span><span class="s">&quot;.data: %x -&gt; %x</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span>
+<span class="p">.</span><span class="n">data</span><span class="o">:</span><span class="w"> </span><span class="mi">20000000</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">20000000</span>
+<span class="p">(</span><span class="n">gdb</span><span class="p">)</span><span class="w"> </span><span class="n">printf</span><span class="w"> </span><span class="s">&quot;.bss: %x -&gt; %x</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span>
+<span class="p">.</span><span class="n">bss</span><span class="o">:</span><span class="w"> </span><span class="mi">20000000</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="mi">20000004</span>
+</code></pre></div>
+
+<p>Woops, since I zero-initialised it, the linker automatically placed it in <code>.bss</code>. Changing it to a <code>uint8_t</code> and setting the default value to anything but 0 does however demonstrate that the linker places it in <code>.data</code> as we would expect.</p>
+<p>So far, we've prepared the simplest part of the processor, however, I want my MCU to write something nice and kind to me.</p>
+<h2>Receiving messages from the MCU</h2>
+<p>So, there were two ways in which I was considering implementing this:</p>
+<ol>
+<li>Universal synchronous/asynchronous receiver/transmitter (USART)</li>
+<li>Semi-hosting</li>
+</ol>
+<p>My idea of USART is that it's essentially just a communication bridge between the MCU and any peripheral which supports the protocol.
+All MCUs in the STM32F103xx family support USART, but they would likely require a physical serial interface across the appropriate pins, of which, there are three potential interfaces (<code>USART1</code> to <code>USART3</code>.) This can be achieved by soldering the GPIO header onto the MCU, connecting a USB-to-TTL adapter (like <a href="https://www.aliexpress.com/item/1005003536455256.html">this</a>), and then configuring the COM driver host-side to display data.</p>
+<p>At the moment, this isn't an option while the adapter ships from mainland China, so the simplest route is option (2): semi-hosting. This is more generally applicable to any ARM targets(?), and it involves passing-through system calls from the target to host through debugging breakpoints (or the <code>SVC</code> supervisor call instruction), which is recognised by OpenOCD, and then appropriately handled host-side; returning the result into the correct register once the system call is completed.</p>
+<p>I've simply created a separate <code>io.c/h</code> file-pair, and defined the <code>trace_print</code> function:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+
+<span class="cp">#ifdef ARM_SEMIHOSTED</span>
+<span class="n">�</span><span class="w">� </span><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">initialise_monitor_handles</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="cp">#endif</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">io_init</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">trace_print</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">s</span><span class="p">);</span>
+
+<span class="kt">int</span>
+<span class="nf">trace_print</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">s</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="cp">#ifdef ARM_SEMIHOSTED</span>
+<span class="n">�</span><span class="w">� </span><span class="k">return</span><span class="w"> </span><span class="n">puts</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="cp">#else</span>
+<span class="n">�</span><span class="w">� </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="n">�</span><span class="w">� </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">s</span><span class="p">[</span><span class="n">len</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">len</span><span class="p">);</span>
+<span class="n">�</span><span class="w">� </span><span class="k">return</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="nf">io_init</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="cp">#ifdef ARM_SEMIHOSTED</span>
+<span class="n">�</span><span class="w">� </span><span class="n">initialise_monitor_handles</span><span class="w"> </span><span class="p">();</span>
+<span class="cp">#endif</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><code>initialise_monitor_handles</code> is provided by the <code>rdimon</code> library, which must be linked against, as well as removing <code>-nostartfiles</code> so that we can link against the CRT with <code>-lc</code>.
+Then, we can add a new <code>Makefile</code> rule:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">debug</span><span class="o">:</span><span class="w"> </span><span class="n">build</span><span class="o">/</span><span class="n">firmware</span><span class="o">.</span><span class="na">elf</span>
+<span class="err">�</span><span class="w">� </span><span class="n">openocd</span><span class="w"> </span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="kd">interface</span><span class="sr">/stlink.cfg -f target/s</span><span class="n">tm32f1x</span><span class="o">.</span><span class="na">cfg</span><span class="w"> </span><span class="o">\</span>
+<span class="err">�</span><span class="w">� </span><span class="err">�</span><span class="w">� </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;init&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="err">�</span><span class="w">� </span><span class="err">�</span><span class="w">� </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;reset halt&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="err">�</span><span class="w">� </span><span class="err">�</span><span class="w">� </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;arm semihosting enable&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="err">�</span><span class="w">� </span><span class="err">�</span><span class="w">� </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;resume&quot;</span>
+</code></pre></div>
+
+<p>And so, we have semi-hosting configured. Let us introduce the MCU to our host:</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">isr_reset_handler</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">�</span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">io_init</span><span class="w"> </span><span class="p">();</span>
+<span class="n">�</span><span class="w">� </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
+
+<span class="n">�</span><span class="w">� </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hello from the stm32 :)&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Running <code>make debug</code> after <code>make flash</code>:</p>
+<div class="codehilite"><pre><span></span><code>$<span class="w"> </span>make<span class="w"> </span>debug
+/c/msys64/mingw64/bin/openocd<span class="w"> </span>-f<span class="w"> </span>interface/stlink.cfg<span class="w"> </span>-f<span class="w"> </span>target/stm32f1x.cfg<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="s2">&quot;init&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="s2">&quot;reset halt&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="s2">&quot;arm semihosting enable&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-c<span class="w"> </span><span class="s2">&quot;resume&quot;</span>
+Open<span class="w"> </span>On-Chip<span class="w"> </span>Debugger<span class="w"> </span><span class="m">0</span>.12.0<span class="w"> </span><span class="o">(</span><span class="m">2025</span>-06-13<span class="o">)</span><span class="w"> </span><span class="o">[</span>https://github.com/sysprogs/openocd<span class="o">]</span>
+...
+<span class="o">[</span>stm32f1x.cpu<span class="o">]</span><span class="w"> </span>halted<span class="w"> </span>due<span class="w"> </span>to<span class="w"> </span>breakpoint,<span class="w"> </span>current<span class="w"> </span>mode:<span class="w"> </span>Thread
+xPSR:<span class="w"> </span>0x01000000<span class="w"> </span>pc:<span class="w"> </span>0x08001a0c<span class="w"> </span>msp:<span class="w"> </span>0x20000fb8
+semihosting<span class="w"> </span>is<span class="w"> </span>enabled
+Info<span class="w"> </span>:<span class="w"> </span>Listening<span class="w"> </span>on<span class="w"> </span>port<span class="w"> </span><span class="m">6666</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>tcl<span class="w"> </span>connections
+Info<span class="w"> </span>:<span class="w"> </span>Listening<span class="w"> </span>on<span class="w"> </span>port<span class="w"> </span><span class="m">4444</span><span class="w"> </span><span class="k">for</span><span class="w"> </span>telnet<span class="w"> </span>connections
+hello<span class="w"> </span>from<span class="w"> </span>the<span class="w"> </span>stm32<span class="w"> </span>:<span class="o">)</span>
+</code></pre></div>
+
+<p>Voila: our first embedded hello world.</p>
+<p>Note that semi-hosting is apparently uncommon to use for debugging, primarily due to the performance loss, which makes sense. I felt the consequences when I tried to use <code>printf</code> with a format specifier, and suddenly <code>objcopy</code> failed because trying to populate the <code>.data</code> section caused the <code>FLASH</code> memory region to exceed its 32KB size.
+Obviously, there are bound to be space-efficient solutions, whether in terms of a leaner standard library, or by writing thin interfaces over the <code>SYS_WRITE</code> system call.</p>
+<p>Ideally, I hope to write my own driver for the USB-TTL adapter, so that I can gain experience in dealing with peripheral state.</p>
+<h2>Triggering software interrupts</h2>
+<p>So, looking through the vector table in the reference manual, what I was interested in is creating software interrupts (SWI) so I can get a taste of how IRQ handlers are executed and return. The most important register here is the <code>EXTI</code> (from the external interrupt/event controller), and specifically <code>EXTI.SWIER</code> (software-interrupt event register,) which is a 20-bit field (masked by <code>EXTI.IMR</code>) that allows you to trigger interrupts, which must then be correspondingly cleared in <code>EXTI.PR</code> by the IRQ handler.
+What was weird was that there's neither a catch-all IRQ dispatcher, nor just a per-line IRQ handler for these SWIs--there's a mix of both:</p>
+<ul>
+<li><code>+0x58 EXTI0</code> to <code>+0x68 EXTI4</code> map five individual lines</li>
+<li><code>+0x9C EXTI9_5</code> and <code>+0xE0 EXTI15_10</code> map the next five lines into a grouped IRQ handler</li>
+</ul>
+<p>And there's no mapping for the remaining 4 lines (the 20th bit has reserved functionality,) so we can only register 16 IRQ handlers.</p>
+<p>Anyways, for a proof of concept, we can just unmask the first bit in the IMR, set it high in the SWIER and register our <code>EXTI0</code> IRQ handler, right?
+Apparently not--we also have to enable IRQ in the nested vectored interrupt controller (NVIC).</p>
+<h3>Quick aside on representing some of the structures in C</h3>
+<p>The ARM specification system structure groupings are slightly contrary to how the CMSIS header implements them. My primary gripe was with understanding why, for example, <code>SCB.ACTLR</code> was spaced so far behind the next field <code>SCB.CPUID</code>, but then <code>ICTR</code>, which is listed under the technical reference manual as a field of the NVIC, is adjacent to <code>ACTLR</code>, which itself has nothing to do with the NVIC.
+There's likely a decent explanation from the hardware perspective, but reading the <a href="https://github.com/ARM-software/CMSIS_5/blob/develop/CMSIS/Core/Include/core_cm3.h">CMSIS</a> implementation indicates that they separate those two registers entirely into a structure called <code>SCnSCB</code> (System Controls not in the System Control Block.)</p>
+<h2>Enabling SWIs in the NVIC</h2>
+<p>Moving forward, we need to modify the correct NVIC interrupt set-enable registers (ISER) in order to enable the corresponding interrupt. There are 8 ISERs, each mapping 32 interrupts, although our device only supports up to 60. The <code>EXTI0</code> line has interrupt position 6, so we're looking to toggle bit 6 of <code>ISER[0]</code>.
+Then, we want to tell the processor to process any interrupts on line 0 by unmasking it in the <code>IMR</code>, and then finally queue the event by setting the respective line bit in <code>SWIER</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">volatile</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_irq_exti0</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we&#39;re in the EXTI0 IRQ routine!&quot;</span><span class="p">);</span>
+<span class="n">�</span><span class="w">� </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">pr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_reset</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="p">...</span>
+<span class="n">�</span><span class="w">� </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
+
+<span class="n">�</span><span class="w">� </span><span class="nf">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">irq_called</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we returned to isr_reset!&quot;</span><span class="p">);</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="p">}</span>
+<span class="n">�</span><span class="w">� </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="n">main</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;enabling interrupts&quot;</span><span class="p">);</span>
+<span class="n">�</span><span class="w">� </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="s">&quot;cpsie i&quot;</span><span class="w"> </span><span class="p">);</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;configuring ISER, IMR and SWIER&quot;</span><span class="p">);</span>
+<span class="n">�</span><span class="w">� </span><span class="n">REG_NVIC</span><span class="o">-&gt;</span><span class="n">iser</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">imr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;SWI should trigger soon&quot;</span><span class="p">)</span>
+<span class="n">�</span><span class="w">� </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">swier</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>And tada! It seems to have worked as expected. The code appears to run with or without the <code>cpsie i</code>, since interrupts are enabled by default, but naturally it will not function without them enabled.</p>
+<p>Initially nothing I tried worked; I went through a large deal of trouble scouring over the ARM specification, relating it to the STM32 manual, and diagnosing why the interrupt handler didn't seem to get called no matter what--and although the solution was trivial, it reminded me of the horror of having to work in an environment where nobody nor nothing will tell you that you messed something up, and will just remain silently broken (I wrote the wrong NVIC address.)</p>
+<p>For better or for worse, here are some vital reference addresses for the STM32F103xx low-density family of MCUs:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#define BND_BASE_EXTI   (0x40010400)</span>
+<span class="cp">#define BND_BASE_SCB    (0xE000ED00)</span>
+<span class="cp">#define BND_BASE_SCnSCB (0xE000E000)</span>
+<span class="cp">#define BND_BASE_NVIC   (0xE000E100)</span>
+<span class="cp">#define BND_BASE_RCC    (0x40021000)</span>
+<span class="cp">#define BND_BASE_AFIO   (0x40010000)</span>
+</code></pre></div>
+
+<h2>What about system calls?</h2>
+<p>They're simpler in principle, since they're just handled by the processor without need for any configuration, aside from needing a system call handler to function. The <code>SVC #imm</code> instruction causes an exception, which stores the state onto stack and execution is transferred to the handler.</p>
+<p>After an hour or so of mindless and both shameless copying since I don't have a good grasp on ARM assembly, I've inevitably come to the age old conclusion that it's never as simple as it ever seems. Since the processor just pushes the context information onto the stack, you need to recover the instruction pointer and grab the system call number from the instruction, which is fairly trivial since apparently ARM Thumb mode doesn't have that complicated instruction encoding, but one quickly comes to the conclusion it's better off writing the function in inline assembly, because otherwise you need to rely on the compiler not generating its own stack-frame and muddling your offsets.</p>
+<div class="codehilite"><pre><span></span><code><span class="n">__attribute__</span><span class="p">((</span><span class="w"> </span><span class="kr">naked</span><span class="w"> </span><span class="p">))</span>
+<span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_svc_call</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="p">(</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;tst lr, #4</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;ite eq</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;mrseq r0, msp</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;mrsne r0, psp</span><span class="se">\n</span><span class="s">&quot;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;ldr r1, [r0, #24]</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;ldrh r2, [r1, #-2]</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;and r1, r2, #0xFF</span><span class="se">\n</span><span class="s">&quot;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;push {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;mov r2, r0</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;mov r0, r1</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;mov r1, r2</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;bl isr_fwd_svc_call</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;pop {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
+
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="s">&quot;bx lr</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="o">:::</span><span class="w"> </span><span class="s">&quot;memory&quot;</span>
+<span class="n">�</span><span class="w">� </span><span class="n">�</span><span class="w">� </span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>There are four main stages of the assembly:</p>
+<ol>
+<li>Test to see if we're using the main system stack or a specific program stack: choose the correct one to forward</li>
+<li>Retrieve the instruction pointer and extract the immediate byte</li>
+<li>Save our link-register, prepare and  pass the two parameters <code>(uin8_t svc_number, void* stack_frame)</code> to pass into <code>isr_fwd_svc_call</code></li>
+<li>Restore state, and tell the processor we're done, so that it can do its magic to get us back to the normal flow of execution</li>
+</ol>
+<p>Upon observing <code>lr</code>, it seems to be a negative signed value <code>0xfffffff9</code> which upon researching is identified as <code>EXC_RETURN</code>, which tells the processor to perform a set of special operations instead of just outright placing execution back to <code>lr</code>, i.e. restoring the context from stack and using the stored <code>lr</code>.</p>
+<p>And so, we can begin creating our own implementation of system calls which opens innumerable doors into how we can separate user-space from privileged-space, implement I/O, memory management, all the boring sounding stuff.</p>
+<h2>What's next?</h2>
+<p>In my former years I'd always enjoyed the idea of writing a fully integrated bootloader/kernel/user-space, but the idea doesn't quite ring out to me when working with MCUs, since they're a more ideal, standardised environment which doesn't feel like it would contribute to the crux of what OS development envelopes.
+On the other hand, and as unbelievable as it seems, I haven't even begun touching upon the complicated parts of embedded development. Experiencing the unique debugging experience and problems that come with working in a constrained environment is what sparks the joy in embedded development for myself. However, reading complex datasheets, reference manuals, and being limited by my physical access to components is certainly a unique experience which feels much more industrious than any issue I've had in software development.</p>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+
+
+    </footer>
+  </body>
+</html>
