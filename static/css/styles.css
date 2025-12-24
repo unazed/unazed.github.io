@@ -46,7 +46,7 @@ a i { border-bottom: 1px dotted }
 a:active i { border: none }
 
 h2, h3, h4, h5, h6 {
-    margin-bottom: var(--lh);
+    margin-top: var(--lh);
     margin-left: -1ch;
     font-weight: bold;
 }
