@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Instrumentation callbacks, et al.</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; Instrumentation callbacks, et al.</p>
+
+    </header>
+    <main>
+      
+  <p>The instrumentation callback is fairly standard:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">push</span><span class="w">    </span><span class="n">r10</span><span class="w"> </span><span class="p">{</span><span class="n">ic_return_address</span><span class="p">}</span>
+<span class="n">push</span><span class="w">    </span><span class="n">rax</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rax</span><span class="p">}</span>
+<span class="n">pushfq</span><span class="w">   </span><span class="p">{</span><span class="n">flags</span><span class="p">}</span>
+<span class="n">push</span><span class="w">    </span><span class="n">rbx</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rbx</span><span class="p">}</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rbx</span><span class="p">,</span><span class="w"> </span><span class="n">rsp</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rbx</span><span class="p">}</span>
+<span class="n">lea</span><span class="w">     </span><span class="n">rax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">rel</span><span class="w"> </span><span class="n">instrumentation_callback</span><span class="p">]</span>
+<span class="n">cmp</span><span class="w">     </span><span class="n">rcx</span><span class="p">,</span><span class="w"> </span><span class="n">rax</span>
+<span class="n">cmove</span><span class="w">   </span><span class="n">rcx</span><span class="p">,</span><span class="w"> </span><span class="n">r10</span>
+<span class="n">lea</span><span class="w">     </span><span class="n">r10</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="mh">-0xc0</span><span class="w"> </span><span class="p">{</span><span class="n">var_e0</span><span class="p">}]</span>
+<span class="n">and</span><span class="w">     </span><span class="n">r10</span><span class="w"> </span><span class="p">{</span><span class="n">var_e0</span><span class="p">},</span><span class="w"> </span><span class="mh">0xfffffffffffffff0</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rsp</span><span class="p">,</span><span class="w"> </span><span class="n">r10</span>
+<span class="n">cld</span><span class="w">     </span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xb0</span><span class="w"> </span><span class="p">{</span><span class="n">target_address_1</span><span class="p">}],</span><span class="w"> </span><span class="n">rcx</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xa8</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rdx</span><span class="p">}],</span><span class="w"> </span><span class="n">rdx</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xa0</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r8</span><span class="p">}],</span><span class="w"> </span><span class="n">r8</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x98</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r9</span><span class="p">}],</span><span class="w"> </span><span class="n">r9</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x90</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r11</span><span class="p">}],</span><span class="w"> </span><span class="n">r11</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x80</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm0</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm0</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x70</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm1</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm1</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x60</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm2</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm2</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x50</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm3</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm3</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x40</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm4</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm4</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x30</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm5</span><span class="p">}],</span><span class="w"> </span><span class="n">xmm5</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rcx</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rbx</span><span class="o">+</span><span class="mh">0x18</span><span class="w"> </span><span class="p">{</span><span class="n">ic_return_address</span><span class="p">}]</span>
+<span class="n">call</span><span class="w">    </span><span class="n">ic_to_LdrInitThunk_or_UserApcDispatch</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rbx</span><span class="o">+</span><span class="mh">0x18</span><span class="w"> </span><span class="p">{</span><span class="n">var_8</span><span class="p">}],</span><span class="w"> </span><span class="n">rax</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rcx</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xb0</span><span class="w"> </span><span class="p">{</span><span class="n">target_address_1</span><span class="p">}]</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rdx</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xa8</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rdx</span><span class="p">}]</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">r8</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0xa0</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r8</span><span class="p">}]</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">r9</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x98</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r9</span><span class="p">}]</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">r11</span><span class="p">,</span><span class="w"> </span><span class="n">qword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x90</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_r11</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm0</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x80</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm0</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm1</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x70</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm1</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm2</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x60</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm2</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm3</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x50</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm3</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm4</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x40</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm4</span><span class="p">}]</span>
+<span class="n">movaps</span><span class="w">  </span><span class="n">xmm5</span><span class="p">,</span><span class="w"> </span><span class="n">xmmword</span><span class="w"> </span><span class="p">[</span><span class="n">rsp</span><span class="o">+</span><span class="mh">0x30</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_zmm5</span><span class="p">}]</span>
+<span class="n">mov</span><span class="w">     </span><span class="n">rsp</span><span class="p">,</span><span class="w"> </span><span class="n">rbx</span>
+<span class="n">pop</span><span class="w">     </span><span class="n">rbx</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rbx</span><span class="p">}</span>
+<span class="n">popfq</span><span class="w">   </span>
+<span class="n">pop</span><span class="w">     </span><span class="n">rax</span><span class="w"> </span><span class="p">{</span><span class="n">__saved_rax</span><span class="p">}</span>
+<span class="n">pop</span><span class="w">     </span><span class="n">r10</span><span class="w"> </span><span class="p">{</span><span class="n">var_8</span><span class="p">}</span>
+<span class="n">jmp</span><span class="w">     </span><span class="n">r10</span>
+</code></pre></div>
+
+<p>Which simply boils down to:</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">instrumentation_callback</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="o">*</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="cm">/* rcx */</span><span class="p">,</span><span class="w"> </span><span class="kt">uint64_t</span><span class="o">*</span><span class="w"> </span><span class="n">return_rip</span><span class="w"> </span><span class="cm">/* r10 */</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">instrumentation_callback</span><span class="p">)</span>
+<span class="w">        </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">return_rip</span><span class="p">;</span>
+<span class="w">    </span><span class="n">__jump</span><span class="w"> </span><span class="p">(</span><span class="n">ic_to_LdrInitThunk_or_UserApcDispatch</span><span class="w"> </span><span class="p">(</span><span class="n">return_rip</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Then, the proceeding function essentially switches against <code>return_rip</code> to determine which function was called, and act based on that:</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">void</span>
+<span class="nf">ic_to_LdrInitThunk_or_UserApcDispatch</span><span class="w"> </span><span class="p">(</span><span class="kt">uint64_t</span><span class="o">*</span><span class="w"> </span><span class="n">return_rip</span><span class="w"> </span><span class="cm">/* rcx */</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">return_rip</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="o">&amp;</span><span class="no">LdrInitializeThunk</span><span class="p">:</span>
+<span class="w">            </span><span class="n">__clearTrap</span><span class="w"> </span><span class="p">();</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ic_LdrInitializeThunk</span><span class="p">;</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="o">&amp;</span><span class="no">KiUserApcDispatcher</span><span class="p">:</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ic_KiUserApcDispatcher</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="cm">/* these functions not matched, read below */</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Essentially injecting its own intermediate functionality for either Windows function, if neither function is matched, then it continues as such:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">__teb</span><span class="o">-&gt;</span><span class="n">ExceptionList</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">return_rip</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">&amp;</span><span class="n">KiUserExceptionDispatcher</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ic_KiUserApcDispatcher</span><span class="p">;</span>
+<span class="w">    </span><span class="n">__clearTrap</span><span class="w"> </span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="cm">/* `return_rip`, unmodified */</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+  <a href="/">&gt; home</a>
+
+    </footer>
+  </body>
+</html>

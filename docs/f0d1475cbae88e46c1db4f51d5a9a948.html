@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Implementing serial TTL-to-USB on the STM32F411 via UART</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; Implementing serial TTL-to-USB on the STM32F411 via UART</p>
+
+    </header>
+    <main>
+      
+  <h2>Introduction</h2>
+<p>I proposed a follow-up from the previous discussion on the STM32F103, where I suggested picking up a TTL-to-USB adapter which I could use to implement a more concrete, performant communication channel between the MCU and host:</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">Ideally</span>,<span class="w"> </span><span class="nv">I</span><span class="w"> </span><span class="nv">hope</span><span class="w"> </span><span class="nv">to</span><span class="w"> </span><span class="nv">write</span><span class="w"> </span><span class="nv">my</span><span class="w"> </span><span class="nv">own</span><span class="w"> </span><span class="nv">driver</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">the</span><span class="w"> </span><span class="nv">USB</span><span class="o">-</span><span class="nv">TTL</span><span class="w"> </span><span class="nv">adapter</span>,<span class="w"> </span><span class="nv">so</span><span class="w"> </span><span class="nv">that</span><span class="w"> </span><span class="nv">I</span><span class="w"> </span><span class="nv">can</span><span class="w"> </span><span class="nv">gain</span><span class="w"> </span><span class="nv">experience</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="nv">dealing</span><span class="w"> </span><span class="nv">with</span><span class="w"> </span><span class="nv">peripheral</span><span class="w"> </span><span class="nv">state</span>.
+</code></pre></div>
+
+<p>So, I purchased some CP2102 break-out boards, and let them collect dust for a little while as I mentally prepared myself for the pain that would inevitably be having to work with it.
+CP2102 is a USB-to-UART bridge, which has readily available COM drivers for us to interface on Windows, so it seemed the most intuitive choice.</p>
+<p>As expected, it involved a couple days of pain and regret before I surpassed my first goal: getting the first real <em>"Hello, embedded world!"</em> displayed on my computer concocted entirely by the MCU. The discussion that follows covers some of the tricky portions that I encountered, and some of the important bases to cover when working with peripherals.</p>
+<h2>The first step: connecting it up physically. Correctly.</h2>
+<p>Much like the ST-Link debugging interface that I'd been using to semi-host the STM32F103 (i.e. enable debugging capabilities and I/O between my PC and the MCU,) the CP2102 break-out contains silkscreen which (most likely) will correspond to pins on your MCU development board.
+Those pins being <code>GND</code>, <code>3V3</code> (or <code>5V</code>), and then <code>TXD</code> and <code>RXD</code>. More than likely your MCU will not have dedicated nor pre-configured UART transmission/receival pins, but certain pins will be configurable <em>to</em> be used as such through STM32 registers.</p>
+<p>On my board, the <code>A2</code>/<code>A3</code> pins (as annotated on the silkscreen) correspond to <code>PA2</code>/<code>PA3</code>, which you may deduce either from your manufacturer's datasheet, or the place from which you ordered the MCU from will likely have a graphic depicting which break-out pins correspond to which GPIO pins.
+Note that <code>Pxy</code> refers to port <code>x</code>, pin <code>y</code>--useful nomenclature which will be referred to in the reference manual.</p>
+<p>Now, searching <code>PA2</code> in the datasheet (which contains the pinout information) tells us that it may be configured for the following functions:</p>
+<div class="codehilite"><pre><span></span><code>TIM2_CH3, TIM5_CH3, TIM9_CH1, I2S2_CKIN, USART2_TX, EVENTOUT
+</code></pre></div>
+
+<p>Principally important is <code>USART2_TX</code>, therefore it will be our UART transmission pin, by the same method we can discover that <code>PA3</code> is for receival.</p>
+<p>I spent a <strong>lot</strong> of time debugging, validating, and verifying code that may well have been working, just to find out that connecting the CP2102's <code>TXD</code> to the pin responsible for UART <code>TX</code> is in fact not correct. It's not constructed as a pass-through, but rather <code>TXD</code> means transmission from the host to the MCU, so it will need to be received into our allotted <code>RX</code> pin (<code>PA3</code> in my case.)</p>
+<p>Once the four pins (assuming you're connecting only <code>3V3</code> or <code>5V</code>, and not both for whatever reason) are connected, and it shows a red light once connected, you're off to the races.</p>
+<h2>Some key differences between the STM32F103 and STM32F411</h2>
+<p>Aside the key differences in flash, SRAM, and increased clock frequency, there's some other differences that posed as subtle obstacles in trying to port my STM32F103 hardware abstraction layer (HAL) over:</p>
+<ol>
+<li>The STM32F4x series of MCUs are Cortex-M4, unlike the former which is Cortex-M3. The quintessential difference is just that the Cortex-M4 has a floating-point unit coprocessor (FPU) (which lets us do more math :),) which may have adjusted offsets for CPU-specific registers and regions.
+   Consult the ARM documentation, I didn't have any issues in my time, but I had no need to use anything non-STM32-specific.</li>
+<li>The boundary addresses are almost all entirely different: I ran my code several times with the wrong RCC (clock-related) register boundary address, and it was entirely silent outside of the consequence it didn't work. Always double-check your addresses.</li>
+<li>Some register structures are modified. This, again, will likely show no obvious symptoms, so foremost due diligence is important.</li>
+</ol>
+<p>It's always confusing to navigate reference manuals with hundreds of pages, block/timing diagrams, and seeing concepts that seem related to your goals, but are entirely unrelated in the bigger picture. Always aim to get a minimal working proof of concept that you understand conceptually, and worry about the particulars of efficiency and correctness later. It's sometimes much easier to understand why something's poorly done than to figure out why something doesn't work at all.</p>
+<h2>Where should we start with the code?</h2>
+<p>So, this was naturally the trickiest part, since delving into peripherals with an entirely theoretical understanding means that you may be prone to overthinking, over-researching, or just generally confusing yourself. It's unsurprisingly very complex at first sight--so many clocks, bridges (low and high performance, for either hardware and peripherals), hundreds of registers with names which are beyond obnoxious, and much more.</p>
+<h3>Clocks</h3>
+<p>The first crucial thing to understand is clocks, since they're intimately coupled with serial baud-rate (just how fast data is transmitted/received.) All they do fundamentally is generate "pulses" at constant-time intervals, which we interpret as frequency: a 10Hz clock generates 10 pulses every second, so we could schedule a task on each pulse--fairly simple.</p>
+<p>As most simple things we have in life, they are inextricably powerful building components for systems which need to have a heartbeat, or rhythm, by which they perform all their functions. For you and I to have a conversation, we need to understand when the other is talking, as to not talk over one another. The same principle follows for serial transmission.</p>
+<p>At the highest level in the STM32, we have the system clock, which is just a generalisation of whichever specific clock "implementation" we have available or chosen. This primary clock drives everything we care about, and it lends itself to the derived clocks that power buses. So called derived since they may have a lesser or larger frequency proportional to the system clock.</p>
+<h3>Buses</h3>
+<p>Then we continue to buses, highways for data between components, whether internal to the CPU or across peripherals, like UART for our CP2102 interface. The implementation of these is specific to Cortex-M4 and the AMBA-3 specification, but simply put, there are three high-performance buses (AHBs) and one peripheral bus (APB.)</p>
+<p>Pedantically speaking, although steering more towards a comprehensive theoretical understanding, there are instruction/data/system/DMA "buses" which are all arbitrated by the bus matrix, although the ARM manual coins these instead as interfaces which, then, subsequently uses one of the AHBs to communicate.
+For the the STM32 specifically, it seems like there's only one AHB and two APB buses, which I won't question despite it being contraindicative to the ARM manual, but at least it's simpler. Oh, and the AHB is split into two <code>AHB1</code> and <code>AHB2</code> with different characteristics for both, presumably for optimisation.</p>
+<p>Now, the CP2102 will be communicating across one of these peripheral buses, which we'll have to choose between since why would they be qualitatively identical? Our life would be too easy if that were so.</p>
+<h3>Connecting clocks, buses, and peripherals</h3>
+<p>I naively thought that we would just have a fixed frequency from which we could tune our baud-rate from the get-go, and connecting everything together will be like a jigsaw.
+<strong>No,</strong> these MCUs are designed for very powerful flexibility in power optimisation (hence their ubiquity in industrial applications,) and as far as the system is concerned from a reset state, everything is pretty much turned off except for the system clock. We'll have to turn everything on that we need to move forward.</p>
+<p>So, clocks drive buses which drive peripherals: which clocks do we need to enable for what we want to achieve? A rule of thumb seems to be that anything that involves registers will likely have an associated clock, this meaning that the GPIO pins and the UART mechanism will have clocks, since, well, we need to specify how we want to interpret the data coming into the pins, and likewise for UART transmission.</p>
+<p>That's about it. It's all just clocks, timing, zzz.</p>
+<h2>Sounds boring, what about the actual code?</h2>
+<p>Okay, so let me jot down what we need to do functionally to get what we need working:</p>
+<ol>
+<li>Mandatory STM32 setup, initialisation vector setup, copying <code>.data</code> over to SRAM, etc.</li>
+<li>Enable the clocks for the things we want to use</li>
+<li>Configure our GPIO pins for reading and writing</li>
+<li>Enable the UART functionality on those pins</li>
+<li>Configure the UART functionality to match whatever we're using on the receiving side</li>
+<li>Send a nice message over to ourselves</li>
+<li>Pop a bottle of champagne</li>
+</ol>
+<p>The first step is covered by simply importing over the boilerplate code we've written for the STM32F103 and adjusting certain register boundary addresses according to the STM32F411 and Cortex-M4 manual. Then, we need to enable the clock for the appropriate GPIO pins, which in the case of UART would be across port A.</p>
+<h3>Enabling the clocks</h3>
+<p>Referencing the manual, we deduce from <code>Table 1: register boundary addresses</code> that the GPIO peripherals are driven by the AHB1 bus, so we may likely configure the functionality through some <code>RCC_AHB1xx</code> sub-register. Let's take a look:</p>
+<p><img src="img//Pasted image 20250801070911.png" style="display:block;margin:0 auto;" /></p>
+<p>Lo and behold, <code>GPIOAEN</code> (GPIO port A ENable) is what we're looking for to enable the peripheral clock since it's designated as <code>Set and cleared by software</code>, so all we need to do is:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">REG_RCC</span><span class="o">-&gt;</span><span class="n">AHB1ENR</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+</code></pre></div>
+
+<p>And it's done! Now what about UART? The same <code>Table 1</code> tells us <code>USART2</code> is designated to <code>APB1</code>, and <code>USART1</code> is <code>APB2</code>: so which should we pick? The datasheet holds all the answers in a monolithic block diagram:</p>
+<p><img src="img//Pasted image 20250801071529.png" style="display:block;margin:0 auto;" /></p>
+<p><code>APB1</code> clocks up to 50MHz, whereas <code>APB2</code> may go to 100MHz. So, the question is do we really care? The answer for embedded applications that couldn't be less mission critical is <strong>no</strong>. Let's choose <code>APB1</code> since it's probably more economical on power usage with a lower clock-frequency.</p>
+<p>So, we need to enable <code>USART2EN</code> inside <code>RCC_APB1ENR</code>, following the same pattern as before:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">REG_RCC</span><span class="o">-&gt;</span><span class="n">APB1ENR</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mb">0b1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">17</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Now, we don't like magic numbers, so these should be extracted into macros like <code>RCC_AHB1ENR_GPIOAEN</code> and <code>RCC_APB1ENR_USART2EN</code>, and perhaps even further as macros like <code>RCC_APB1_ENABLE(clock)</code> for readability.</p>
+<p>Note that the documentation refers to USART, whose difference to UART seems to just be synchroneity through two additional pins <code>XCK</code> and <code>XDIR</code>, removing the need for specifying transmission rate with an agreed upon baud-rate. We don't use this functionality, so we can simply refer to what we're doing as UART.</p>
+<h3>Configuring the pins for GPIO and UART</h3>
+<p>So, the only thing we need to configure for GPIO is to specify to the MCU its intention is UART, which is an alternate function (AF), and its speed. The manual indicates we need to adjust the <code>MODER</code> (port MODE Register) and set pins 2/3 to <code>0b10</code>, indicating both pins will have alternate functions assigned to them.</p>
+<p>I have it extracted into a tidy macro to refrain from the reader needing to see bit-shifting vomit, but hopefully this is not your biggest concern: </p>
+<div class="codehilite"><pre><span></span><code><span class="n">GPIOx_MODER_CONFIGURE</span><span class="p">(</span><span class="n">REG_GPIOA</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">GPIO_MODER__AF</span><span class="p">);</span>
+<span class="n">GPIOx_MODER_CONFIGURE</span><span class="p">(</span><span class="n">REG_GPIOA</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">GPIO_MODER__AF</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Now before we assign which alternate functions, we should likely set the speed to make sure the electrical characteristics are stable (it seems like a sound reason;) naturally, <code>OSPEEDR</code> controls this parameter, and is set similarly in code:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">GPIOx_OSPEEDR_CONFIGURE</span><span class="p">(</span><span class="n">REG_GPIOA</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">GPIO_OSPEEDR__FAST</span><span class="p">);</span>
+<span class="n">GPIOx_OSPEEDR_CONFIGURE</span><span class="p">(</span><span class="n">REG_GPIOA</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">GPIO_OSPEEDR__FAST</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Note that there's lots of GPIO ports, hence <code>GPIOx</code>, and likely lots of other things that are grouped, so don't waste time making hundreds of macro definitions when you could just pass the specific thing as the first parameter. My macro definition for <code>GPIOx_OSPEEDR_CONFIGURE</code> looks like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#define GPIOx_OSPEEDR_CONFIGURE(reg_gpio, y, val) \</span>
+<span class="cp">  ({ \</span>
+<span class="cp">    (reg_gpio)-&gt;ospeedr &amp;= ~(0b11 &lt;&lt; (2 * (y))); \</span>
+<span class="cp">    (reg_gpio)-&gt;ospeedr |= (val) &lt;&lt; (2 * (y)); \</span>
+<span class="cp">  })</span>
+</code></pre></div>
+
+<p>Not particularly pretty, handsome, or efficient, and it could certainly be made more compiler-agnostic, but it maintains a level of decent macro practice.</p>
+<h3>Does the speed really matter?</h3>
+<p>The datasheet is unsurprisingly more cryptic when it comes to understanding what frequency this means the pins can run at, since it's far more intertwined with electrical engineering--but, here's what seems relevant:</p>
+<p><img src="img//Pasted image 20250801074032.png" style="display:block;margin:0 auto;" /></p>
+<p><code>GPIO_OSPEEDR__FAST</code> is <code>Ob10</code> which corresponds with the lefthand-side column, as for what the capacitive load and $V_{DD}$ refers to... I don't really know. We can likely assume $V_{DD} \geq 2.70 V$ since we're powering on 3.3V, and since we're on <code>APB1</code> we can likely infer that 50MHz will be the maximum frequency we can get anyways, so the capacitive load doesn't matter.
+I tried looking in more depth, but it's fairly complicated, and all these characteristics seem to determine is how quickly the signals transition from low-to-high levels, so higher speed is a quicker transition and lower speed is more slewed--which might be important if we were doing anything significant.</p>
+<h3>Assigning the pins to do UART</h3>
+<p>So, we want to assign an alternate function to the two pins, fortunately we have a GPIO AFR (Alternate Function Register) which does this exactly:</p>
+<p><img src="img//Pasted image 20250801080332.png" style="display:block;margin:0 auto;" /></p>
+<p>The AFR is split into low/high since each pin uses 4 bits but we have 16 ports, thus needing 64 bits. We can abstract this away with macro magic since they may be inconsequentially regarded as the same. Now, which alternate function specifier do we want?
+<code>Figure 17</code> somewhere above, but in the same GPIO section, will give us the answer:</p>
+<p><img src="img//Pasted image 20250801080833.png" style="display:block;margin:0 auto;" /></p>
+<p><code>AF7</code> enables both UART1 and UART2 for the pins we designate, so there is our answer: we set each AFR pin to <code>0b0111</code>. The macro I wrote looks like this:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#define GPIOx_AFR_CONFIGURE(reg_gpio, y, val) \</span>
+<span class="cp">  ({ \</span>
+<span class="cp">    stm_word_t adj_y = (y &gt; 7)? y - 8: y; \</span>
+<span class="cp">    if (y &gt; 7) \</span>
+<span class="cp">      (reg_gpio)-&gt;afrh = \</span>
+<span class="cp">        ((reg_gpio)-&gt;afrh &amp; ~(0b1111 &lt;&lt; (4 * adj_y))) | (val &lt;&lt; (4 * adj_y)); \</span>
+<span class="cp">    else \</span>
+<span class="cp">      (reg_gpio)-&gt;afrl = \</span>
+<span class="cp">        ((reg_gpio)-&gt;afrl &amp; ~(0b1111 &lt;&lt; (4 * adj_y))) | (val &lt;&lt; (4 * adj_y)); \</span>
+<span class="cp">  })</span>
+</code></pre></div>
+
+<p>We just clear the existing bits at the position, and bitwise OR it against our new <code>val</code>, ensuring we choose the right register based on which pin we wish to address.</p>
+<h3>Configuring UART so our computer understands us when we talk</h3>
+<p>Now all the sudden this becomes a little more complicated since we need to know what actual clock-frequency we're running at to calculate the baud-rate. This means we need to know the derived clock frequency of the <code>APB1</code> bus, since that's what <code>UART2</code> is running from.</p>
+<h3>Math jump-scare!</h3>
+<p>As a forenote, the formula we're working with is:
+$$\text{USARTDIV} = \frac{f_{CK}}{8*(2 - \text{OVER8}) * \text{Baud}}$$
+$f_{CK}$ refers to the <code>APB1</code> clock frequency, and $\text{Baud}$ is our desired baud. $\text{OVER8}$ is 1 if we're using oversampling by 8, otherwise 0 if we're oversampling by 16; this is a parameter which seems to result in better noise detection by sampling the receiving line at higher intervals as shown below:</p>
+<p><img src="img//Pasted image 20250801082839.png" style="display:block;margin:0 auto;" /></p>
+<p>Typically, we'll be using oversampling by 16, so our formula reduces to:
+$$\text{USARTDIV} = \frac{f_{CK}}{16 * \text{Baud}}$$</p>
+<p>$\text{USARTDIV}$ is the value we will be putting into our baud-rate register, which will be touched upon soon.</p>
+<h3>How do we figure out the clock frequencies?</h3>
+<p>I'll try to run through this section quickly since it's not really interesting. In theory we can source our system clock-frequency from many sources, but typically at reset we'll be using the HSI internal clock, which according to the datasheet demonstrates a typical frequency of 16MHz.
+<code>RCC_CFGR</code> (ConFiGuration Register) has a two-bit bitfield <code>SWS</code> which is--</p>
+<div class="codehilite"><pre><span></span><code>--set and cleared by hardware to indicate which clock source is used as the system clock
+</code></pre></div>
+
+<p>Great, so it can be either HSI, HSE or PLL. Frankly, if it's either of the other two, then it's up to you to figure it out since it's likely external or something you've configured yourself. Either way, we can systematically figure out which, and so by verifying it's HSI we know we're at 16MHz.</p>
+<p>Now, the same configuration register also contains values named prescalers which downscale the main clock frequency by a constant divisor: the AHB clock is prescaled from the system clock, and the APB clocks are prescaled from the AHB clock. These values are available from the <code>HPRE</code> and <code>PPRE1/2</code> bits.</p>
+<div class="codehilite"><pre><span></span><code><span class="w">  </span><span class="n">stm_word_t</span><span class="w"> </span><span class="n">ahb_div</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">RCC_CFGR_HPRE</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">RCC_CFGR_HPRE</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">8</span><span class="p">));</span>
+<span class="w">  </span><span class="n">stm_word_t</span><span class="w"> </span><span class="n">apb1_div</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">RCC_CFGR_PPRE1</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="p">(</span><span class="n">RCC_CFGR_PPRE1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">4</span><span class="p">));</span>
+<span class="w">  </span><span class="n">stm_word_t</span><span class="w"> </span><span class="n">ahb_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clk_freq</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">ahb_div</span><span class="p">,</span>
+<span class="w">             </span><span class="n">apb1_clk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ahb_clk</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">apb1_div</span><span class="p">;</span>
+
+<span class="w">  </span><span class="n">iprintf</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;AHB clock: %lu MHz</span><span class="se">\n</span><span class="s">APB1 clock: %lu MHZ</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ahb_clk</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span>
+<span class="w">    </span><span class="n">apb1_clk</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1000000</span>
+<span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+
+<p><code>clk_freq</code> is determined in a switch-statement earlier based on the <code>SWS</code> bits.</p>
+<h3>Now how do we calculate the baud-rate?</h3>
+<p>Well, first we need to take a look at the UART register map:</p>
+<p><img src="img//Pasted image 20250801085435.png" style="display:block;margin:0 auto;" /></p>
+<p><code>USART_BRR</code> is the register we're interested in at the moment. The term mantissa might bring back horrors from having to deal with floating points, but thankfully it's not too egregious here:
+$$\text{USARTDIV} = \text{DIV_Mantissa} + \frac{\text{DIV_Fraction}}{16}$$
+So, <code>DIV_Fraction</code> is just the decimal portion of the division from the other $\text{USARTDIV}$ formula, but multiplied by 16. As a small example, if our $\text{USARTDIV} = 25.125$, then $\text{DIV_Mantissa} = 25$ and $\text{DIV_Fraction} = 16 * 0.125 = 2$. Nothing complicated, just stuff those into the 12/4 bits and forget about it.</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">uint32_t</span>
+<span class="nf">calculate_usart_brr</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">apb_clock</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">baud_rate</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">usartdiv_16x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">apb_clock</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">baud_rate</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">baud_rate</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">mantissa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">usartdiv_16x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">fraction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">usartdiv_16x</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">brr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">mantissa</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="n">fraction</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xF</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">brr</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div>
+
+<p>The <code>usartdiv_16x</code> calculation is just essentially:
+$$16*\text{USARTDIV} = \left\lfloor\frac{f_{CK}}{\text{Baud}} + \frac{1}{2}\right\rfloor$$
+So we're just rounding to the nearest integer instead of truncating, just for that little bit of additional precision, and then we pack it into the mantissa and fraction bits. That's all we have to do.</p>
+<h3>Are we ready to turn it on?</h3>
+<p>Not quite yet, not if we don't tell UART we're ready to receive and transmit. These are toggled by the <code>UE</code> (USART Enable), <code>RE</code> (Receiver Enable) and <code>TE</code> (Transmitter Enable) bits in <code>CR1</code> referenced in the previous diagram:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">cr1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">USART_CR1_UE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">USART_CR1_TE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">USART_CR1_RE</span><span class="p">;</span>
+</code></pre></div>
+
+<p>Preferably ensure <code>CR1</code> is cleared before you set <code>BRR</code>.</p>
+<p>Now we're ready to do whatever we want! Everything's explained and there's no additional registers we'll need outside of what has already been mentioned, so here are the functions for reading and transmitting:</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">char</span>
+<span class="nf">usart2_read</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">sr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">USART_SR_RXNE</span><span class="p">));</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">dr</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="nf">usart2_putc</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">sr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">USART_SR_TXE</span><span class="p">));</span>
+<span class="w">    </span><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">dr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">REG_USART2</span><span class="o">-&gt;</span><span class="n">sr</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">USART_SR_TC</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="kt">void</span>
+<span class="nf">usart2_puts</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">c</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">stm_word_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="w">    </span><span class="n">usart2_putc</span><span class="w"> </span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>Nothing ground-breaking, we make sure we have something to read, and conversely that the transmission buffer is empty before we write something else, and optionally wait until the transmission was marked as complete.
+Now the line that everything has built towards:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">usart2_puts</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hello, embedded world :)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Assuming you have the COM drivers and PuTTY connected at the corresponding baud-rate, you should get this:</p>
+<p><img src="img//Pasted image 20250801091854.png" style="display:block;margin:0 auto;" /></p>
+<p>Beautiful.</p>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+  <a href="/">&gt; home</a>
+
+    </footer>
+  </body>
+</html>

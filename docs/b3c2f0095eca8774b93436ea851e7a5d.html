@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>RISC-V to x86{-64} transpilation programming notes</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; RISC-V to x86{-64} transpilation programming notes</p>
+
+    </header>
+    <main>
+      
+  <h1>Architectural notes</h1>
+<ul>
+<li>RV32/64I (<em>I</em> for base <em>integer</em> ISA) has 32 general purpose registers, not including <code>pc</code>, denoted as <code>x0</code> to <code>x31</code>. <code>x0</code> is a null-register which is always zeroed.</li>
+<li>RV32/64E (<em>E</em> for base integer <em>embedded</em> ISA) has half the count, at 16 GPRs.</li>
+<li>The different instruction formats are constructed somewhat-aligned to the R-type format; observe:</li>
+</ul>
+<p><img src="img//Pasted image 20251003220539.png" style="display:block;margin:0 auto;" /></p>
+<p>R-type contains fundamental fields which exist at their position in each subsequent format, unless replaced with an immediate specifier. The immediate specifiers (such as <code>imm[19:12]</code>) appear scrambled, but their indices correlate with similar indications in prior, i.e. J-type's <code>imm[10:1]</code> is contained within I-type's <code>imm[11:0]</code>, and similarly for other types except the U-type format, which represents the upper half of an immediate.
+Keep in mind this is a hardware-level optimisation to minimise fan-out, as it preserves the ability to carry-through logic lines (?) across different formats since they share fields at the same positions. Same reasoning applied to the fundamental <code>rd</code>/<code>rs*</code>/etc. fields.
+- <code>XLEN</code> refers to the integer register width (either 32 or 64 bits,) unrelated to word size, which is 32 bits regardless.</p>
+<h1>Programming notes</h1>
+<ul>
+<li>Emulation state should store a reference to GPRs with the consideration that there may be 16 or 32</li>
+<li>For making a generic instruction base <code>struct</code>, the only reasonably optimal solution is creating a union across the different formats, enabling access semantics as <code>insn.j.imm__19_12</code>. Separating the formats into different <code>struct</code>s may complicate type genericity further down the line.</li>
+</ul>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+  <a href="/">&gt; home</a>
+
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Probabilistic `rdtsc` branches</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; Probabilistic `rdtsc` branches</p>
+
+    </header>
+    <main>
+      
+  <p>A fairly common pattern in the binary., with varied magic numbers, appears as follows:</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">uint64_t</span><span class="w"> </span><span class="n">tsc_mult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">__readtsc64</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mh">0xa7c0d228df246425</span>
+<span class="kt">uint64_t</span><span class="w"> </span><span class="n">operand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mh">0x5ee3610225d96522</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tsc_mult</span><span class="p">)</span><span class="w"> </span><span class="n">u</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">45</span>
+<span class="kt">uint64_t</span><span class="w"> </span><span class="n">shift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mh">0x5ee3610225d96522</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tsc_mult</span><span class="p">)</span><span class="w"> </span><span class="n">u</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">59</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">ror</span><span class="p">.</span><span class="n">d</span><span class="p">(</span>
+<span class="w">    </span><span class="p">((</span><span class="mh">0x5ee3610225d96522</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tsc_mult</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">27</span><span class="p">).</span><span class="n">d</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">operand</span><span class="p">.</span><span class="n">d</span><span class="p">,</span>
+<span class="w">    </span><span class="n">shift</span><span class="p">.</span><span class="n">b</span>
+<span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0x16041cf</span>
+<span class="p">)</span>
+<span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>With a simple simulation, pursuant to:</p>
+<div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdint.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;inttypes.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;limits.h&gt;</span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">multiplicand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0xa7c0d228df246425</span><span class="p">;</span>
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">addend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x5ee3610225d96522</span><span class="p">;</span>
+
+<span class="cm">/* defns. omitted for brevity */</span>
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">rotl32</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">rotr32</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">cnt_branch_taken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">mult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">multiplicand</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">operand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">addend</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">mult</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">45</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">shift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">addend</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">mult</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">59</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rotr32</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)((</span><span class="n">addend</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">mult</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">27</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">operand</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)</span><span class="n">shift</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mh">0x16041cf</span><span class="p">)</span>
+<span class="w">      </span><span class="n">cnt_branch_taken</span><span class="o">++</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w"> </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;probability of branch being taken: %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cnt_branch_taken</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">pow</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">64</span><span class="p">)</span><span class="mi">-1</span><span class="p">));</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>We gather that there's about a 0.54% (around 1 in 185) chance of the branch evaluating true: this may be a way to probabilistically guarantee that the positive branch will evaluate at least every now and then, as opposed to a fixed interval.
+Further testing could conclude how this probability is concretely affected by the parameters, such as the magic-number multiplicands and the threshold (<code>0x16041cf</code> in the sample,) although assuming that <code>((addend + mult) &gt;&gt; 27) ^ operand</code> is uniformly distributed over the <code>[0, 2**37)</code> range, then it should follow that the threshold is proportionate to the probability of a positive branch hit.</p>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+  <a href="/">&gt; home</a>
+
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Opaque data in the TEB's `GdiTebBatch.Buffer` and `glDispatchTable`</title>
+  </head>
+  <body>
+    <header>
+      <p>m. taujanskas</p>
+      <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; Opaque data in the TEB's `GdiTebBatch.Buffer` and `glDispatchTable`</p>
+
+    </header>
+    <main>
+      
+  <p>A non-insignificant quantity of branches across the decompilation appear dependent on two principal offsets into the <code>TEB-&gt;GdiTebBatch.Buffer</code>, at <code>+0x82</code> and <code>+0x106</code>. Comparisons against <code>qword</code>s supposedly stored at these offsets are performed against constant values, which appear to all share a similar numerical prefix--observe:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">gsbase</span><span class="o">-&gt;</span><span class="n">NtTib</span><span class="p">.</span><span class="n">Self</span><span class="o">-&gt;</span><span class="n">GdiTebBatch</span><span class="p">.</span><span class="n">Buffer</span><span class="p">[</span><span class="mh">0x106</span><span class="p">].</span><span class="n">q</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mh">0x2adeeacfe659f8ff</span><span class="p">)</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">gsbase</span><span class="o">-&gt;</span><span class="n">NtTib</span><span class="p">.</span><span class="n">Self</span><span class="o">-&gt;</span><span class="n">GdiTebBatch</span><span class="p">.</span><span class="n">Buffer</span><span class="p">[</span><span class="mh">0x82</span><span class="p">].</span><span class="n">q</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mh">0x2adeefcf470df6ab</span><span class="p">)</span>
+</code></pre></div>
+
+<p>These appear to be the only two values associated with these respective buffer positions. There appears to be no indication of where these two values are initialised, and educational resources are scarce on the TEB, let alone how to interpret these values.
+Although, there is some semblance of hope in understanding <a href="https://techshelps.github.io/MSDN/BUILDAPP/devdoc/live/pdapp/09high_69pv.htm">GDI batching</a>: it is simply a way to store and execute a larger quantity of GDI commands, and this <code>GdiTebBatch.Buffer</code> stores these commands as <code>ULONG</code>s. However, in order for them to be processed by the system, the buffer must be flushed (through <code>GdiFlush</code>,) though this symbol does not seem to be transparently imported.</p>
+<p>Heuristic analysis of these kinds of branches seems to determine that when the comparison (equality) evaluates false, i.e. <code>GdiTebBatch.Buffer[offs] != 0x...</code>, the proceeding branch is valid, otherwise it tends to exhibit nonsensical behaviour, but sometimes it may appear normal, as depicted below:</p>
+<p><img src="img//Pasted image 20251202141108.png" /></p>
+<p>So, if we decide to believe that it is a guaranteed false evaluation, further backed by the fact that it never appears to be set explicitly in this binary database, and thus cannot become true at any point, then it would simply reduce to an opaque predicate. Otherwise, the way by which it is stored (assuming it is just hidden,) may reveal more about the state context of the program.
+I believe it's unlikely that the latter is true, since it means that a lot of functions would depend on just two state variables (at both offsets in the buffer,) which would be exceedingly simple for how complex the application is; otherwise, they would have to be fundamental state variables that should be easy to infer from how they alter local function state.
+It may be insightful to look into how GDI commands are structured, to perhaps gain insight into whether these two constants refer to concrete, recognised commands--although this is unlikely to prove meaningful.</p>
+<p><img src="img//Pasted image 20251203133218.png" style="display:block;margin:0 auto;" /></p>
+<p>Additionally, a similar opaque pattern is used on <code>glDispatchTable</code>, although this time it can be easily inferred that the compared values are invalid for the purpose of the table, as is described <a href="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/inc/api/pebteb/teb/index.htm">here</a>:</p>
+<blockquote>
+<p>The <code>glDispatchTable</code> in version 3.51 is filled to capacity with pointers to functions [...]</p>
+</blockquote>
+<p>And no instance of comparison lends itself to a valid function pointer, nor do we see any assignments into <code>glDispatchTable</code>, so we may assume all equality comparisons yield false.</p>
+
+    </main>
+    <footer>
+      <p>-</p>
+      
+  <a href="/">&gt; home</a>
+
+    </footer>
+  </body>
+</html>

@@ -3,14 +3,17 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/pygments.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <title>Unnamed</title>
+    <link rel="stylesheet" href="css/pygments.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Working with the STM32F103C6T6</title>
   </head>
   <body>
     <header>
       <p>m. taujanskas</p>
       <p>-</p>
+      
+  <p style="margin-left:1em;font-style:italic;">&gt; Working with the STM32F103C6T6</p>
+
     </header>
     <main>
       
@@ -132,25 +135,25 @@ We must do this in the reset handler, since this is essentially the equivalent o
 
 <span class="n">__attribute__</span><span class="p">((</span><span class="w"> </span><span class="n">section</span><span class="p">(</span><span class="s">&quot;.isr_vector&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">))</span>
 <span class="k">const</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">isr_vector</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="o">&amp;</span><span class="n">_estack</span><span class="p">,</span>
-<span class="n">Â</span><span class="w">  </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">isr_reset_handler</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="o">&amp;</span><span class="n">_estack</span><span class="p">,</span>
+<span class="w">  </span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">isr_reset_handler</span>
 <span class="p">};</span>
 
 <span class="kt">void</span>
 <span class="nf">isr_reset_handler</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w"> </span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
+<span class="w">           </span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
+<span class="w">    </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
+<span class="w">    </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">isr_reset_completed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="n">isr_reset_completed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -186,7 +189,7 @@ All MCUs in the STM32F103xx family support USART, but they would likely require 
 <div class="codehilite"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
 
 <span class="cp">#ifdef ARM_SEMIHOSTED</span>
-<span class="n">Â</span><span class="w">  </span><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">initialise_monitor_handles</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="w">  </span><span class="k">extern</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">initialise_monitor_handles</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
 <span class="cp">#endif</span>
 
 <span class="kt">void</span><span class="w"> </span><span class="nf">io_init</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
@@ -196,11 +199,11 @@ All MCUs in the STM32F103xx family support USART, but they would likely require 
 <span class="nf">trace_print</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">s</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="cp">#ifdef ARM_SEMIHOSTED</span>
-<span class="n">Â</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">puts</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">puts</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
 <span class="cp">#else</span>
-<span class="n">Â</span><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="n">Â</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">s</span><span class="p">[</span><span class="n">len</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">len</span><span class="p">);</span>
-<span class="n">Â</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(;</span><span class="w"> </span><span class="n">s</span><span class="p">[</span><span class="n">len</span><span class="p">];</span><span class="w"> </span><span class="o">++</span><span class="n">len</span><span class="p">);</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">len</span><span class="p">;</span>
 <span class="cp">#endif</span>
 <span class="p">}</span>
 
@@ -208,7 +211,7 @@ All MCUs in the STM32F103xx family support USART, but they would likely require 
 <span class="nf">io_init</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="cp">#ifdef ARM_SEMIHOSTED</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">initialise_monitor_handles</span><span class="w"> </span><span class="p">();</span>
+<span class="w">  </span><span class="n">initialise_monitor_handles</span><span class="w"> </span><span class="p">();</span>
 <span class="cp">#endif</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -216,36 +219,36 @@ All MCUs in the STM32F103xx family support USART, but they would likely require 
 <p><code>initialise_monitor_handles</code> is provided by the <code>rdimon</code> library, which must be linked against, as well as removing <code>-nostartfiles</code> so that we can link against the CRT with <code>-lc</code>.
 Then, we can add a new <code>Makefile</code> rule:</p>
 <div class="codehilite"><pre><span></span><code><span class="n">debug</span><span class="o">:</span><span class="w"> </span><span class="n">build</span><span class="o">/</span><span class="n">firmware</span><span class="o">.</span><span class="na">elf</span>
-<span class="err">Â</span><span class="w">  </span><span class="n">openocd</span><span class="w"> </span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="kd">interface</span><span class="sr">/stlink.cfg -f target/s</span><span class="n">tm32f1x</span><span class="o">.</span><span class="na">cfg</span><span class="w"> </span><span class="o">\</span>
-<span class="err">Â</span><span class="w">  </span><span class="err">Â</span><span class="w">  </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;init&quot;</span><span class="w"> </span><span class="o">\</span>
-<span class="err">Â</span><span class="w">  </span><span class="err">Â</span><span class="w">  </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;reset halt&quot;</span><span class="w"> </span><span class="o">\</span>
-<span class="err">Â</span><span class="w">  </span><span class="err">Â</span><span class="w">  </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;arm semihosting enable&quot;</span><span class="w"> </span><span class="o">\</span>
-<span class="err">Â</span><span class="w">  </span><span class="err">Â</span><span class="w">  </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;resume&quot;</span>
+<span class="w">  </span><span class="n">openocd</span><span class="w"> </span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="kd">interface</span><span class="sr">/stlink.cfg -f target/s</span><span class="n">tm32f1x</span><span class="o">.</span><span class="na">cfg</span><span class="w"> </span><span class="o">\</span>
+<span class="w">    </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;init&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="w">    </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;reset halt&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="w">    </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;arm semihosting enable&quot;</span><span class="w"> </span><span class="o">\</span>
+<span class="w">    </span><span class="o">-</span><span class="n">c</span><span class="w"> </span><span class="s2">&quot;resume&quot;</span>
 </code></pre></div>
 
 <p>And so, we have semi-hosting configured. Let us introduce the MCU to our host:</p>
 <div class="codehilite"><pre><span></span><code><span class="kt">void</span>
 <span class="nf">isr_reset_handler</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w"> </span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">uint32_t</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sidata</span><span class="p">,</span>
+<span class="w">           </span><span class="o">*</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_sdata</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">vma_sdata</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_edata</span><span class="p">)</span>
+<span class="w">    </span><span class="o">*</span><span class="n">vma_sdata</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">lma_sdata</span><span class="o">++</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_szero</span><span class="p">;</span><span class="w"> </span><span class="n">szero</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">&amp;</span><span class="n">_ezero</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">szero</span><span class="p">)</span>
+<span class="w">    </span><span class="o">*</span><span class="n">szero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">io_init</span><span class="w"> </span><span class="p">();</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
+<span class="w">  </span><span class="n">io_init</span><span class="w"> </span><span class="p">();</span>
+<span class="w">  </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="kt">void</span>
 <span class="nf">main</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hello from the stm32 :)&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;hello from the stm32 :)&quot;</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -290,50 +293,50 @@ Then, we want to tell the processor to process any interrupts on line 0 by unmas
 
 <span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_irq_exti0</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we&#39;re in the EXTI0 IRQ routine!&quot;</span><span class="p">);</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">pr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we&#39;re in the EXTI0 IRQ routine!&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">pr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_reset</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="w">  </span><span class="p">...</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
+<span class="w">  </span><span class="n">main</span><span class="w"> </span><span class="p">();</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="nf">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">irq_called</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we returned to isr_reset!&quot;</span><span class="p">);</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="p">}</span>
-<span class="n">Â</span><span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">irq_called</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;we returned to isr_reset!&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="n">irq_called</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 
 <span class="kt">void</span>
 <span class="n">main</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;enabling interrupts&quot;</span><span class="p">);</span>
-<span class="n">Â</span><span class="w">  </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="s">&quot;cpsie i&quot;</span><span class="w"> </span><span class="p">);</span>
+<span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;enabling interrupts&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="s">&quot;cpsie i&quot;</span><span class="w"> </span><span class="p">);</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;configuring ISER, IMR and SWIER&quot;</span><span class="p">);</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">REG_NVIC</span><span class="o">-&gt;</span><span class="n">iser</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">imr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;configuring ISER, IMR and SWIER&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="n">REG_NVIC</span><span class="o">-&gt;</span><span class="n">iser</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span>
+<span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">imr</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;SWI should trigger soon&quot;</span><span class="p">)</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">swier</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="n">trace_print</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;SWI should trigger soon&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">REG_EXTI</span><span class="o">-&gt;</span><span class="n">swier</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div>
 
 <p>And tada! It seems to have worked as expected. The code appears to run with or without the <code>cpsie i</code>, since interrupts are enabled by default, but naturally it will not function without them enabled.</p>
 <p>Initially nothing I tried worked; I went through a large deal of trouble scouring over the ARM specification, relating it to the STM32 manual, and diagnosing why the interrupt handler didn't seem to get called no matter what--and although the solution was trivial, it reminded me of the horror of having to work in an environment where nobody nor nothing will tell you that you messed something up, and will just remain silently broken (I wrote the wrong NVIC address.)</p>
 <p>For better or for worse, here are some vital reference addresses for the STM32F103xx low-density family of MCUs:</p>
-<div class="codehilite"><pre><span></span><code><span class="cp">#define BND_BASE_EXTI Â  (0x40010400)</span>
-<span class="cp">#define BND_BASE_SCB Â  Â (0xE000ED00)</span>
+<div class="codehilite"><pre><span></span><code><span class="cp">#define BND_BASE_EXTI   (0x40010400)</span>
+<span class="cp">#define BND_BASE_SCB    (0xE000ED00)</span>
 <span class="cp">#define BND_BASE_SCnSCB (0xE000E000)</span>
-<span class="cp">#define BND_BASE_NVIC Â  (0xE000E100)</span>
-<span class="cp">#define BND_BASE_RCC Â  Â (0x40021000)</span>
-<span class="cp">#define BND_BASE_AFIO Â  (0x40010000)</span>
+<span class="cp">#define BND_BASE_NVIC   (0xE000E100)</span>
+<span class="cp">#define BND_BASE_RCC    (0x40021000)</span>
+<span class="cp">#define BND_BASE_AFIO   (0x40010000)</span>
 </code></pre></div>
 
 <h2>What about system calls?</h2>
@@ -342,27 +345,27 @@ Then, we want to tell the processor to process any interrupts on line 0 by unmas
 <div class="codehilite"><pre><span></span><code><span class="n">__attribute__</span><span class="p">((</span><span class="w"> </span><span class="kr">naked</span><span class="w"> </span><span class="p">))</span>
 <span class="n">DEFN_ISR_ROUTINE</span><span class="p">(</span><span class="n">isr_svc_call</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="p">(</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;tst lr, #4</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;ite eq</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;mrseq r0, msp</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;mrsne r0, psp</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">    </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span>
+<span class="w">    </span><span class="p">(</span>
+<span class="w">      </span><span class="s">&quot;tst lr, #4</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;ite eq</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;mrseq r0, msp</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;mrsne r0, psp</span><span class="se">\n</span><span class="s">&quot;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;ldr r1, [r0, #24]</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;ldrh r2, [r1, #-2]</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;and r1, r2, #0xFF</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;ldr r1, [r0, #24]</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;ldrh r2, [r1, #-2]</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;and r1, r2, #0xFF</span><span class="se">\n</span><span class="s">&quot;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;push {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;mov r2, r0</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;mov r0, r1</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;mov r1, r2</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;bl isr_fwd_svc_call</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;pop {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;push {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;mov r2, r0</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;mov r0, r1</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;mov r1, r2</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;bl isr_fwd_svc_call</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="s">&quot;pop {lr}</span><span class="se">\n</span><span class="s">&quot;</span>
 
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="s">&quot;bx lr</span><span class="se">\n</span><span class="s">&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="o">:::</span><span class="w"> </span><span class="s">&quot;memory&quot;</span>
-<span class="n">Â</span><span class="w">  </span><span class="n">Â</span><span class="w">  </span><span class="p">);</span>
+<span class="w">      </span><span class="s">&quot;bx lr</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">      </span><span class="o">:::</span><span class="w"> </span><span class="s">&quot;memory&quot;</span>
+<span class="w">    </span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -383,7 +386,7 @@ On the other hand, and as unbelievable as it seems, I haven't even begun touchin
     <footer>
       <p>-</p>
       
-
+  <a href="/">&gt; home</a>
 
     </footer>
   </body>

@@ -9,4 +9,4 @@ all:
 	@mkdir -p $(OUTPUT_DIR)/css $(OUTPUT_DIR)/img
 	@cp -r $(STATIC_DIR)/* $(OUTPUT_DIR)
 	$(PYTHON_DIR)/python $(AUTOGEN_DIR)/main.py
-	$(PYTHON_DIR)/pygmentize -S vim -f html -a .codehilite > $(OUTPUT_DIR)/css/pygments.css
+	$(PYTHON_DIR)/pygmentize -S vs -f html -a .codehilite > $(OUTPUT_DIR)/css/pygments.css

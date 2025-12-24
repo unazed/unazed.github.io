@@ -1,9 +1,13 @@
 {% extends "base.html.j2" %}
 
+{% block header %}
+  <p style="margin-left:1em;font-style:italic;">&gt; {{ title }}</p>
+{% endblock %}
+
 {% block content %}
   {{ content }}
 {% endblock %}
 
 {% block footer %}
-
+  <a href="/">&gt; home</a>
 {% endblock %}
