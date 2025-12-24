@@ -64,8 +64,6 @@ span { color: #888 }
 
 nav { margin-top: -.16666em }
 
-p { margin-bottom: var(--lh) }
-
 footer { padding: calc(var(--lh)*2) 0 8vh }
 footer p { margin: 0 }
 
