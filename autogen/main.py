@@ -39,7 +39,7 @@ def main() -> None:
         "content": md.convert(post_content)
       }
     )
-    with open(os.path.join(OUTPUT_DIR, "posts", title.hexdigest()), "w") as fd_post:
+    with open(os.path.join(OUTPUT_DIR, "posts", title.hexdigest() + ".html"), "w") as fd_post:
       fd_post.write(output)
     
 
