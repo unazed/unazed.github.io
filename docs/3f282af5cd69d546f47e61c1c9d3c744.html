@@ -22,7 +22,7 @@
 <p>The "kinetic energy" from which electric potential energy is converted into is current, with a byproduct of thermal energy caused by either natural resistance, or through intentionally resistive components (like resistors) which purposely inhibit the flow of current.</p>
 <h2>Current</h2>
 <p>As described before, current is the result of actualising electric potential energy in a connected circuit. Current describes the rate of flow of charges through a conductive material at a certain point, so it can be represented differentially:
-$$ i = \frac{dq}{dt}$$
+<script type="math/tex; mode=display"> i = \frac{dq}{dt}</script>
 Where $q(t)$ represents the cumulative number of charges having passed through a reference point in the conductor up until time $t$.
 The moment a power source with an active voltage differential across its terminals is applied to a complete circuit, it induces the electric field from which the charges in the conductive material begin to form current. The work necessary to maintain the potential difference across the terminals, and thus to maintain the current, is the sole responsibility of the power source by whichever mechanisms it does so.</p>
 <h3>Batteries</h3>
@@ -32,46 +32,46 @@ The moment a power source with an active voltage differential across its termina
 <p>Note that the optimal path is not already known, all paths of the circuit are "visited" in a sense, but the electric field quicky resolves its steady-state where the current is established according to our formulaic notions.</p>
 <h2>Resistors</h2>
 <p>Resistors decrease the electric potential between its ends, as it converts electric work into heat energy in a controlled manner, thus causing a voltage drop. Note that resistors tend to have less charge carriers than a regular conductive material, so it will constrict the current according to Ohm's law:
-$$ I = \frac{V}{R} $$
+<script type="math/tex; mode=display"> I = \frac{V}{R} </script>
 In a simple circuit with a resistor in series with an ideal power source, the voltage drop will always be the same as the input voltage, as the electric field adjusts itself to whatever strength is necessary to push through the resistor, and so the current will be the only relevant consideration.</p>
 <h3>Voltage division</h3>
 <p>Two or more resistors in series must drop the voltage in a manner which results in the voltage drop equaling the voltage input $V_{in}$, therefore when you have two resistors of resistance $R_1$ and $R_2$ they must split the voltage in proportion to their resistance. Assuming that voltage drop-off is linearly proportional to resistance, we can derive the equations to figure out what the voltage would be between each ends of a resistor in this configuration.</p>
 <p><img src="img//Pasted image 20250715184739.png" style="display:block;margin:0 auto;" /></p>
 <p>Since we have assumed voltage drop-off is linearly proportional to resistance, we have some $V_1 \sim R_1 \to V_1 = kR_1$; similarly, $V_2 = kR_2$, as we assume the constant of proportionality is the same between resistors, thus $\frac{V_1}{V_2} = \frac{R_1}{R_2}$.  given that we have $V_{in} = V_1 + V_2$, we may solve for either voltage drop-off constant without loss of generality:
-$$\begin{aligned}
-V_1 &amp;= \frac{R_1}{R_2}V_2 \
-\to~~V_{in} &amp;= \frac{R_1}{R_2}V_2 + V_2 \
-\to~~V_{in} &amp;= V_2\left(\frac{R_1 + R_2}{R_2}\right) \
-\to~~V_2 &amp;= V_{in}\left(\frac{R_2}{R_1 + R_2}\right)
-\end{aligned}$$
+<script type="math/tex; mode=display">\begin{aligned}
+V_1 &= \frac{R_1}{R_2}V_2 \\
+\to~~V_{in} &= \frac{R_1}{R_2}V_2 + V_2 \\
+\to~~V_{in} &= V_2\left(\frac{R_1 + R_2}{R_2}\right) \\
+\to~~V_2 &= V_{in}\left(\frac{R_2}{R_1 + R_2}\right)
+\end{aligned}</script>
 Which accurately depicts what one's intuition would expect, i.e. that you are taking the proportionality ratio and scaling the input voltage against it to calculate the voltage drop-off for the particular resistor.</p>
 <h3>Current division</h3>
 <p>On the same branch, current division is possible with resistors when they are placed in parallel. Consider the figure below:
 <img src="img//Pasted image 20250715193231.png" style="display:block;margin:0 auto;" />
 We have the given fact that $I_1 + I_2 = I_T$, from this we may derive the circuit resistance:
-$$\begin{aligned}
-I_T &amp;= I_1 + I_2 \
-\frac{V}{R_T} &amp;= \frac{V}{R_1} + \frac{V}{R_2} \
-\to~~\frac{1}{R_T} &amp;= \frac{1}{R_1} + \frac{1}{R_2}
-\end{aligned}$$
+<script type="math/tex; mode=display">\begin{aligned}
+I_T &= I_1 + I_2 \\
+\frac{V}{R_T} &= \frac{V}{R_1} + \frac{V}{R_2} \\
+\to~~\frac{1}{R_T} &= \frac{1}{R_1} + \frac{1}{R_2}
+\end{aligned}</script>
 Since we have $I_T = \frac{V}{R_T}$:
-$$I_T = V\left(\frac{1}{R_1} + \frac{1}{R_2}\right)$$
+<script type="math/tex; mode=display">I_T = V\left(\frac{1}{R_1} + \frac{1}{R_2}\right)</script>
 And subsequently, we may resolve $I_1$ WLOG., given that we know the voltage drop-off is equivalent:
-$$\begin{aligned}
-V &amp;= I_1R_1 \
-&amp;= I_2R_2 \
-I_1 &amp;= I_2 \frac{R_2}{R_1} \
-\text{since}~~I_T &amp;= I_1 + I_2 \
-&amp;= I_2\left(\frac{R_1 + R_2}{R_1}\right) \
-\to~I_2 &amp;= I_T\left(\frac{R_1}{R_1 + R_2}\right) \
-&amp;= V\left(\frac{1}{R_1} + \frac{1}{R_2}\right)\left(\frac{R_1}{R_1 + R_2}\right)
-\end{aligned}$$
+<script type="math/tex; mode=display">\begin{aligned}
+V &= I_1R_1 \\
+&= I_2R_2 \\
+I_1 &= I_2 \frac{R_2}{R_1} \\
+\text{since}~~I_T &= I_1 + I_2 \\
+&= I_2\left(\frac{R_1 + R_2}{R_1}\right) \\
+\to~I_2 &= I_T\left(\frac{R_1}{R_1 + R_2}\right) \\
+&= V\left(\frac{1}{R_1} + \frac{1}{R_2}\right)\left(\frac{R_1}{R_1 + R_2}\right)
+\end{aligned}</script>
 This can be generalised for any subcircuit which holds resistors in parallel, given that the voltage and resistances are known; the derivation is analogous, and simply extends as a result of the conservation of current: $I_T = \sum I_n$. The resistance of the network is called the equivalent resistance, which is denoted as $R_T$ in previous calculations. For resistors in series, this is the piecewise sum of resistances.</p>
 <h3>Kirchhoff's laws</h3>
 <p>Kirchhoff proposed two laws on electronic circuits, which stem further from Maxwell's equations and conservation laws:
-$$\text{KVL:}~~\sum_{i=0}^n V_i = 0$$
+<script type="math/tex; mode=display">\text{KVL:}~~\sum_{i=0}^n V_i = 0</script>
 And
-$$KCL: \sum_{i=0}^n I_i = 0$$
+<script type="math/tex; mode=display">KCL: \sum_{i=0}^n I_i = 0</script>
 Kirchhoff's voltage law (KVL) states that the sum of voltages around any closed loop is zero, e.g. as resistors perform work (leading to a net negative voltage gain), they must inevitably consume the entire voltage input, and thus the sum must become zero starting from a positive source input. This applies for any closed loops which have an entrant voltage and sink.
 Its cousin relation--Kirchhoff's current law--rests on a similar principle, wherein it asserts that current entering and leaving a junction must sum to zero.</p>
 <h2>Capacitors</h2>

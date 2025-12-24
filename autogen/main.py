@@ -34,7 +34,8 @@ def main() -> None:
     'fenced_code',
     'codehilite',
     'extra',
-    'meta'
+    'meta',
+    'mdx_math'
   ])
 
   post_dict: dict[str, list] = {

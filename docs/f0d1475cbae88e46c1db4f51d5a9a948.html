@@ -140,11 +140,12 @@ I tried looking in more depth, but it's fairly complicated, and all these charac
 <p>Now all the sudden this becomes a little more complicated since we need to know what actual clock-frequency we're running at to calculate the baud-rate. This means we need to know the derived clock frequency of the <code>APB1</code> bus, since that's what <code>UART2</code> is running from.</p>
 <h3>Math jump-scare!</h3>
 <p>As a forenote, the formula we're working with is:
-$$\text{USARTDIV} = \frac{f_{CK}}{8*(2 - \text{OVER8}) * \text{Baud}}$$
+<script type="math/tex; mode=display">\text{USARTDIV} = \frac{f_{CK}}{8*(2 - \text{OVER8}) * \text{Baud}}</script>
 $f_{CK}$ refers to the <code>APB1</code> clock frequency, and $\text{Baud}$ is our desired baud. $\text{OVER8}$ is 1 if we're using oversampling by 8, otherwise 0 if we're oversampling by 16; this is a parameter which seems to result in better noise detection by sampling the receiving line at higher intervals as shown below:</p>
 <p><img src="img//Pasted image 20250801082839.png" style="display:block;margin:0 auto;" /></p>
 <p>Typically, we'll be using oversampling by 16, so our formula reduces to:
-$$\text{USARTDIV} = \frac{f_{CK}}{16 * \text{Baud}}$$</p>
+<script type="math/tex; mode=display">\text{USARTDIV} = \frac{f_{CK}}{16 * \text{Baud}}</script>
+</p>
 <p>$\text{USARTDIV}$ is the value we will be putting into our baud-rate register, which will be touched upon soon.</p>
 <h3>How do we figure out the clock frequencies?</h3>
 <p>I'll try to run through this section quickly since it's not really interesting. In theory we can source our system clock-frequency from many sources, but typically at reset we'll be using the HSI internal clock, which according to the datasheet demonstrates a typical frequency of 16MHz.
@@ -171,7 +172,7 @@ $$\text{USARTDIV} = \frac{f_{CK}}{16 * \text{Baud}}$$</p>
 <p>Well, first we need to take a look at the UART register map:</p>
 <p><img src="img//Pasted image 20250801085435.png" style="display:block;margin:0 auto;" /></p>
 <p><code>USART_BRR</code> is the register we're interested in at the moment. The term mantissa might bring back horrors from having to deal with floating points, but thankfully it's not too egregious here:
-$$\text{USARTDIV} = \text{DIV_Mantissa} + \frac{\text{DIV_Fraction}}{16}$$
+<script type="math/tex; mode=display">\text{USARTDIV} = \text{DIV\_Mantissa} + \frac{\text{DIV\_Fraction}}{16}</script>
 So, <code>DIV_Fraction</code> is just the decimal portion of the division from the other $\text{USARTDIV}$ formula, but multiplied by 16. As a small example, if our $\text{USARTDIV} = 25.125$, then $\text{DIV_Mantissa} = 25$ and $\text{DIV_Fraction} = 16 * 0.125 = 2$. Nothing complicated, just stuff those into the 12/4 bits and forget about it.</p>
 <div class="codehilite"><pre><span></span><code><span class="kt">uint32_t</span>
 <span class="nf">calculate_usart_brr</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">apb_clock</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">baud_rate</span><span class="p">)</span>
@@ -186,7 +187,7 @@ So, <code>DIV_Fraction</code> is just the decimal portion of the division from t
 </code></pre></div>
 
 <p>The <code>usartdiv_16x</code> calculation is just essentially:
-$$16*\text{USARTDIV} = \left\lfloor\frac{f_{CK}}{\text{Baud}} + \frac{1}{2}\right\rfloor$$
+<script type="math/tex; mode=display">16*\text{USARTDIV} = \left\lfloor\frac{f_{CK}}{\text{Baud}} + \frac{1}{2}\right\rfloor</script>
 So we're just rounding to the nearest integer instead of truncating, just for that little bit of additional precision, and then we pack it into the mantissa and fraction bits. That's all we have to do.</p>
 <h3>Are we ready to turn it on?</h3>
 <p>Not quite yet, not if we don't tell UART we're ready to receive and transmit. These are toggled by the <code>UE</code> (USART Enable), <code>RE</code> (Receiver Enable) and <code>TE</code> (Transmitter Enable) bits in <code>CR1</code> referenced in the previous diagram:</p>

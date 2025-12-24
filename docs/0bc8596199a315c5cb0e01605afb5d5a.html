@@ -121,18 +121,18 @@ So, I chose to use the basic timer group, since it also allows selection of the 
 <p><strong>Note:</strong> The auto-reload register (ARR) refers to the value the timer will restart counting down/up from when it overflows. The pre-scaler (PSC) register sets the value by which the timer's actual clock is divided.</p>
 <h3>Calculating the update frequency</h3>
 <p>Our update frequency is the rate at which the timer will overflow, contextually adjacent to our audio sampling rate. Absorb the given formula for a moment:
-$$f_\text{OVERFLOW} = \frac{f_\text{TIMx}}{(\text{ARR} + 1)(\text{PSC} + 1)}$$
+<script type="math/tex; mode=display">f_\text{OVERFLOW} = \frac{f_\text{TIMx}}{(\text{ARR} + 1)(\text{PSC} + 1)}</script>
 --and:
-$$f_{\text{TIMx}} = n*f_\text{HCLK},~n=2~\text{iff.}~(\text{D2PPRE1} \geq 4)~\text{otherwise}~1$$
+<script type="math/tex; mode=display">f_{\text{TIMx}} = n*f_\text{HCLK},~n=2~\text{iff.}~(\text{D2PPRE1} \geq 4)~\text{otherwise}~1</script>
 Working from $f_\text{TIMx}$, this obscure constraint on $n$ is derived from the fact that the timer clock frequency may be either equal to the bus' clock which drives the timer, or double its frequency:</p>
 <p><img src="img//Pasted image 20250812171706.png" style="display:block;margin:0 auto;" /></p>
 <p>Deriving $f_\text{HCLK}$ is a separate exercise covered in prior discussions which simply involves taking a look at the product datasheet, and calculating the derived bus clock frequencies using the pre-scalers given in the RCC register.</p>
 <p>So, then we could let $f_\text{OVERFLOW} = 22050$, and work our way backwards determining a set of constraints on ARR and PSC including the fact they're 16-bit registers--but that's not really practical, and albeit as a mental exercise it's interesting, there is a simpler solution.
 Let PSC be zero, and we just have:
-$$\begin{aligned}
-22050 &amp;= \frac{f_\text{TIMx}}{ARR + 1} \
-\to ARR &amp;= \frac{f_\text{TIMx}}{22050} - 1
-\end{aligned}$$
+<script type="math/tex; mode=display">\begin{aligned}
+22050 &= \frac{f_\text{TIMx}}{ARR + 1} \\
+\to ARR &= \frac{f_\text{TIMx}}{22050} - 1
+\end{aligned}</script>
 From what I've gathered, it seems better to have a smaller pre-scaler (and thus larger auto-reload value) so that our timer is more granularly clocked. Intuition seems to agree: if we have a wider auto-reload value, then it's probably going to be more accurate if we want to detect half-transfers, or anything of the likes.
 We're not checking for half-transfers from memory-to-DAC, so it likely doesn't matter for such a simple application, but nonetheless a worthwhile consideration to reduce jitter.</p>
 <h3>Aside on voltage scaling and overclocking</h3>

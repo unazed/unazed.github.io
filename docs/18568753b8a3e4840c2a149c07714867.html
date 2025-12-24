@@ -57,7 +57,7 @@
 <p><code>DAC1_OUT1</code> on <code>PA4</code>, <code>DAC1_OUT2</code> on <code>PA5</code>.
 We're working with pulse-code modulated (PCM) media which is sampled at 22,050Hz and represented by unsigned little-endian 8-bit units. So, we're working with 8-bit right-aligned data which we must write to <code>DAC_DHR8Rx</code>, which is subsequently converted to the internal DHR register, and after $t_{settling}$, the output voltage is available on the appropriate chip pin.</p>
 <p>The output voltage is determined between 0 and $\text{DACoutput}$, where:
-$$\text{DACoutput} = V_{REF} * \frac{\text{DOR}}{4096}$$
+<script type="math/tex; mode=display">\text{DACoutput} = V_{REF} * \frac{\text{DOR}}{4096}</script>
 Where DOR is the data-output register, determined by the data-holding register (DHR.)</p>
 <p>The DAC has two channels, though we only need 1. We need to set <code>TSEL</code> appropriately to sample at an appropriate frequency, i.e. from the timer which we are using to generate the 22kHz signal, as well as <code>TEN</code> and <code>EN</code> to enable triggers and the DAC channel itself.
 The appropriate timer signal is <code>dac_chx_trgy</code> where <code>y</code> is packed into 4-bits in <code>TSEL</code>.</p>
@@ -79,16 +79,16 @@ Since we're double-buffering, by the time first half is ready to be processed--a
 <p><img src="img//Pasted image 20250812171706.png" style="display:block;margin:0 auto;" /></p>
 <p>Odd quirk, if the AHB clock is divided by a factor of 2 or more, the timer clock runs at twice the AHB's frequency.</p>
 <p>Regardless, if we want to generate a sample event at 22.05kHz, we need to "clock" when our overflow event occurs, which is determined by both the prescaler and autoreload value:
-$$f_{\text{OVERFLOW}} = \frac{f_{\text{TIM6}}}{(\text{PSC} + 1)<em>(\text{ARR}+1)}$$
+<script type="math/tex; mode=display">f_{\text{OVERFLOW}} = \frac{f_{\text{TIM6}}}{(\text{PSC} + 1)*(\text{ARR}+1)}</script>
 Both denominator expressions added by 1 to avoid division-by-zero. So, considering we have $f_{\text{TIM6}}$ as:
-$$f_{\text{TIM6}} = n</em>f_\text{HCLK},~n=2~\text{iff.}~(\text{D2PPRE1} \geq 4)~\text{else}~1$$
+<script type="math/tex; mode=display">f_{\text{TIM6}} = n*f_\text{HCLK},~n=2~\text{iff.}~(\text{D2PPRE1} \geq 4)~\text{else}~1</script>
 We need to optimise $\text{PSC}$ to improve clock granularity, and then refine it down to 22.05kHz with an appropriate $\text{ARR}$ value. Consider:
-$$(\text{ARR}+1)(\text{PSC}+1) = \frac{f_\text{TIM6}}{22050~\text{Hz}~[f_\text{OVERFLOW}]}$$
+<script type="math/tex; mode=display">(\text{ARR}+1)(\text{PSC}+1) = \frac{f_\text{TIM6}}{22050~\text{Hz}~[f_\text{OVERFLOW}]}</script>
 If we let $\text{ARR} = \text{PSC}$, then we have:
-$$\begin{aligned}
-\text{ARR}^2 + 2\text{ARR} + 1 - C &amp;= 0 \
-\to [\text{ARR} = \text{PSC}] &amp;= \sqrt{\frac{f_\text{TIM6}}{22050}} - 1
-\end{aligned}$$
+<script type="math/tex; mode=display">\begin{aligned}
+\text{ARR}^2 + 2\text{ARR} + 1 - C &= 0 \\
+\to [\text{ARR} = \text{PSC}] &= \sqrt{\frac{f_\text{TIM6}}{22050}} - 1
+\end{aligned}</script>
 Which for a 4MHz clock, we calculate 12.47 (2 d.p.), although we deviate $\pm 8\%$ with rounding error, which is fairly substantial.</p>
 
     </main>
