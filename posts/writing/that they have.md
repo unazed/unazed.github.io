@@ -1,0 +1,1 @@
+I just fantasise of the conversations I would have with friends, and all the right things they should tell me, and I come to believe that I did, and that they have, and then I am happy,

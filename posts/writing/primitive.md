@@ -1,0 +1,2 @@
+Carved upon the man's body whose sole, primitive desire, was to discover, and journey through the beauties of life with another stood beside him, were the bloodied imprints given to him as consequence of believing the journey was impossible alone.
+She speaks to him in a language neither may have any chance of understanding; but it feels so intimate, as though roots sprawled from his heart; yet to blossom for her in the form of a beautiful tree.
